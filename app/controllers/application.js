@@ -1,34 +1,54 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { later } from '@ember/runloop';
 
 export default class ApplicationController extends Controller {
   @action
-  analyseAudio() {
-    const video = document.createElement('video');
-    video.setAttribute('src', 'video.mp4');
-    video.controls = true;
-    video.autoplay = true;
-    document.body.appendChild(video);
-
+  async analyseAudio() {
     const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
 
-    const source = audioContext.createMediaElementSource(video);
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
+    const request = new XMLHttpRequest();
+    request.open('GET', 'video.mp4', true);
+    request.responseType = 'arraybuffer';
 
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    request.onload = function() {
+      var audioData = request.response;
 
-    later(
-      this,
-      function() {
-        const audioData = analyser.getByteTimeDomainData(dataArray);
-        debugger;
-      },
-      1000
-    );
+      audioContext.decodeAudioData(
+        audioData,
+        function(buffer) {
+          const offline = new OfflineAudioContext(2, buffer.length, 44100);
+          const bufferSource = offline.createBufferSource();
+          bufferSource.buffer = buffer;
+
+          var analyser = offline.createAnalyser();
+          var scp = offline.createScriptProcessor(1024, 0, 1);
+
+          bufferSource.connect(analyser);
+          scp.connect(offline.destination); // this is necessary for the script processor to start
+
+          var freqData = new Uint8Array(analyser.frequencyBinCount);
+          scp.onaudioprocess = function() {
+            analyser.getByteTimeDomainData(freqData);
+            if (freqData.every(item => item === 128)) {
+              console.log('all items 128');
+            } else {
+              console.log(freqData);
+            }
+          };
+
+          bufferSource.start(0);
+          offline.oncomplete = function(e) {
+            console.log('analysed');
+          };
+          offline.startRendering();
+        },
+
+        function(e) {
+          console.log('Error with decoding audio data' + e.err);
+        }
+      );
+    };
+
+    request.send();
   }
 }
