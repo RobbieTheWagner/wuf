@@ -39,6 +39,7 @@
     "ember-data": "~3.16.0",
     "ember-export-application-global": "^2.0.1",
     "ember-fetch": "^7.0.0",
+    "ember-file-upload": "^2.7.1",
     "ember-load-initializers": "^2.1.1",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-meta": "^0.6.1",
