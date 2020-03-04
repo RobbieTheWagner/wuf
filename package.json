@@ -18,6 +18,7 @@
     "test": "ember test"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
     "@ember/optional-features": "^1.3.0",
     "@glimmer/component": "^1.0.0",
     "@glimmer/tracking": "^1.0.0",
@@ -31,6 +32,7 @@
     "ember-cli-eslint": "^5.1.0",
     "ember-cli-htmlbars": "^4.2.2",
     "ember-cli-inject-live-reload": "^2.0.2",
+    "ember-cli-postcss": "^5.0.0",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-template-lint": "^1.0.0-beta.3",
     "ember-cli-uglify": "^3.0.0",
@@ -39,13 +41,21 @@
     "ember-fetch": "^7.0.0",
     "ember-load-initializers": "^2.1.1",
     "ember-maybe-import-regenerator": "^0.1.6",
+    "ember-meta": "^0.6.1",
     "ember-qunit": "^4.6.0",
     "ember-resolver": "^7.0.0",
+    "ember-service-worker": "^0.8.4",
+    "ember-service-worker-asset-cache": "^0.6.4",
+    "ember-service-worker-index": "^0.7.0",
     "ember-source": "~3.16.0",
     "eslint-plugin-ember": "^7.7.2",
     "eslint-plugin-node": "^11.0.0",
     "loader.js": "^4.7.0",
-    "qunit-dom": "^1.0.0"
+    "postcss-import": "^12.0.1",
+    "postcss-nested": "^4.2.1",
+    "postcss-scss": "^2.0.0",
+    "qunit-dom": "^1.0.0",
+    "tailwindcss": "^1.2.0"
   },
   "engines": {
     "node": "10.* || >= 12"
