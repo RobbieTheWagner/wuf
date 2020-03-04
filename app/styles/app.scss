@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+@import 'nav-menu.scss';
+
+body {
+  @apply text-gray-900;
+  background-color: #d4faec;
+  font-family: 'Poppins', sans-serif;
+}

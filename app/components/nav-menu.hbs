@@ -1,0 +1,56 @@
+<nav class="flex h-20 items-center justify-center p-6 w-full">
+  <div class="flex font-medium items-center justify-between max-w-6xl w-full">
+    <div class="flex flex-no-shrink items-center pl-2 pr-2 pt-2">
+      <a href="/" class="inline-flex">
+        <div class="inline-block">
+          {{svg-jar "wuf" class="-mt-2 p-2" height="60" width="60"}}
+        </div>
+        <div class="text-3xl">
+          Wüf
+        </div>
+      </a>
+    </div>
+
+    <div class="block lg:hidden">
+      <button
+        aria-label="Open navigation menu"
+        class="flex items-center px-3 py-2 text-grey hover:text-navy text-xl"
+        {{on "click" (fn this.toggleNavMenu false)}}
+      >
+        {{svg-jar "menu" height="36px" width="36px"}}
+      </button>
+    </div>
+
+    <div class="nav-links hidden lg:flex">
+      <div class="lg:flex lg:flex-grow lg:justify-end">
+        <div class="flex lg:hidden justify-end m-4">
+          <button
+            aria-label="Close navigation menu"
+            class="cursor-pointer"
+            {{on "click" (fn this.toggleNavMenu false)}}
+          >
+            {{svg-jar "close" class="h-10 m-2 p-2 w-10"}}
+          </button>
+        </div>
+        {{link-to
+          "Home"
+          "index"
+          class="nav-link"
+          invokeAction=(fn this.toggleNavMenu false)
+        }}
+        {{link-to
+          "File Upload"
+          "upload"
+          class="nav-link"
+          invokeAction=(fn this.toggleNavMenu false)
+        }}
+        {{link-to
+          "Microphone"
+          "microphone"
+          class="nav-link"
+          invokeAction=(fn this.toggleNavMenu false)
+        }}
+      </div>
+    </div>
+  </div>
+</nav>

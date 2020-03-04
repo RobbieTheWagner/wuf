@@ -22,6 +22,11 @@ module.exports = function(defaults) {
           require('postcss-nested')
         ]
       }
+    },
+    prember: {
+      urls: [
+        '/'
+      ]
     }
   });
 

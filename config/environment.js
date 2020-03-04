@@ -23,6 +23,15 @@ module.exports = function(environment) {
     }
   };
 
+  ENV['ember-meta'] = {
+    description: 'Talk to your dog with Ember!',
+    imgSrc: 'http://i.imgur.com/KVqNjgO.png',
+    siteName: 'Wüf',
+    title: 'Wüf',
+    twitterUsername: '@shipshapecode',
+    url: 'https://wuf.plus/'
+  };
+
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;

@@ -1,0 +1,30 @@
+.nav-links {
+  @apply .bg-white .fixed .flex-grow .h-screen .inset-0 .w-full;
+}
+
+@screen lg {
+  .nav-links {
+    @apply .bg-transparent .h-auto .items-center .pl-2 .pr-2 .pt-2 .static .w-auto;
+  }
+}
+
+.nav-link {
+  @apply .block .font-bold .p-4 .text-base .text-gray-600;
+  transition: color 0.25s;
+}
+
+@screen lg {
+  .nav-link {
+    @apply .inline-block .mt-0;
+  }
+}
+
+.nav-link:active,
+.nav-link:visited {
+  @apply .text-gray-600;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  @apply .text-gray-900;
+}
