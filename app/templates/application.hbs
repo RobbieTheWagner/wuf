@@ -9,6 +9,26 @@
   </div>
 </nav>
 
-<AudioUploader @uploadAudioVideo={{this.uploadAudioVideo}} />
+<div class="mb-2 mt-2">
+  <h2 class="font-bold text-2xl">
+    Files
+  </h2>
 
-<canvas class="bg-black" id="canvas" width="800" height="256"></canvas>
+  <AudioUploader @uploadAudioVideo={{this.uploadAudioVideo}} />
+</div>
+
+<div class="mb-2 mt-2">
+  <h2 class="font-bold text-2xl">
+    Microphone
+  </h2>
+
+  <AudioCapturer @uploadAudioVideo={{this.uploadAudioVideo}} />
+</div>
+
+<div class="mb-2 mt-2">
+  <h2 class="font-bold text-2xl">
+    Visualization
+  </h2>
+
+  <canvas class="bg-black" id="canvas" width="800" height="256"></canvas>
+</div>

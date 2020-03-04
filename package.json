@@ -49,6 +49,7 @@
     "ember-service-worker-asset-cache": "^0.6.4",
     "ember-service-worker-index": "^0.7.0",
     "ember-source": "~3.16.0",
+    "ember-svg-jar": "^2.2.3",
     "eslint-plugin-ember": "^7.7.2",
     "eslint-plugin-node": "^11.0.0",
     "loader.js": "^4.7.0",
