@@ -15,6 +15,7 @@
       <button
         aria-label="Open navigation menu"
         class="flex items-center px-3 py-2 text-grey hover:text-navy text-xl"
+        type="button"
         {{on "click" (fn this.toggleNavMenu false)}}
       >
         {{svg-jar "menu" height="36px" width="36px"}}
@@ -27,29 +28,35 @@
           <button
             aria-label="Close navigation menu"
             class="cursor-pointer"
+            type="button"
             {{on "click" (fn this.toggleNavMenu false)}}
           >
             {{svg-jar "close" class="h-10 m-2 p-2 w-10"}}
           </button>
         </div>
-        {{link-to
-          "Home"
-          "index"
+        <LinkTo
           class="nav-link"
-          invokeAction=(fn this.toggleNavMenu false)
-        }}
-        {{link-to
-          "File Upload"
-          "upload"
+          @route="index"
+          @invokeAction={{fn this.toggleNavMenu false}}
+        >
+          Home
+        </LinkTo>
+
+        <LinkTo
           class="nav-link"
-          invokeAction=(fn this.toggleNavMenu false)
-        }}
-        {{link-to
-          "Microphone"
-          "microphone"
+          @route="upload"
+          @invokeAction={{fn this.toggleNavMenu false}}
+        >
+          File Upload
+        </LinkTo>
+
+        <LinkTo
           class="nav-link"
-          invokeAction=(fn this.toggleNavMenu false)
-        }}
+          @route="microphone"
+          @invokeAction={{fn this.toggleNavMenu false}}
+        >
+          Microphone
+        </LinkTo>
       </div>
     </div>
   </div>
