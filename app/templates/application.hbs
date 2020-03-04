@@ -9,33 +9,6 @@
   </div>
 </nav>
 
-<FileDropzone @name="photos" as |dropzone|>
-  {{#if dropzone.active}}
-    {{#if dropzone.valid}}
-      Drop to upload
-    {{else}}
-      Invalid
-    {{/if}}
-  {{else}}
-    <h4>
-      Upload Audio/Video
-    </h4>
-    <p>
-      {{#if dropzone.supported}}
-        Drag and drop audio/video files onto this area to upload them or
-      {{/if}}
-      <FileUpload
-        @name="audio"
-        @accept="audio/*,video/*"
-        @multiple={{false}}
-        @onfileadd={{this.uploadAudioVideo}}
-      >
-        <a id="upload-audio" tabindex="0">
-          Add audio/video.
-        </a>
-      </FileUpload>
-    </p>
-  {{/if}}
-</FileDropzone>
+<AudioUploader @uploadAudioVideo={{this.uploadAudioVideo}} />
 
-<canvas class="bg-black" id="canvas" width="800" height="256" ></canvas>
+<canvas class="bg-black" id="canvas" width="800" height="256"></canvas>

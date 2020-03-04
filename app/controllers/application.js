@@ -29,9 +29,6 @@ export default class ApplicationController extends Controller {
     };
 
     bufferSource.start(0);
-    offline.oncomplete = function(e) {
-      console.log('analysed');
-    };
     offline.startRendering();
   }
 
