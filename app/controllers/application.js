@@ -2,6 +2,10 @@ import Controller from '@ember/controller';
 import { action } from '@ember/object';
 
 export default class ApplicationController extends Controller {
+  canvasWidth = 800;
+  canvasHeight = 256;
+  column = 0;
+
   /**
    * Analyze the audio data and provide vizualizations
    * @param {AudioBuffer} buffer The audio buffer containing our sound data
@@ -18,14 +22,10 @@ export default class ApplicationController extends Controller {
     bufferSource.connect(analyser);
     scp.connect(offline.destination); // this is necessary for the script processor to start
 
-    var freqData = new Uint8Array(analyser.frequencyBinCount);
-    scp.onaudioprocess = function() {
-      analyser.getByteTimeDomainData(freqData);
-      if (freqData.every(item => item === 128)) {
-        console.log('all items 128');
-      } else {
-        console.log(freqData);
-      }
+    this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
+    scp.onaudioprocess = () => {
+      analyser.getByteTimeDomainData(this.amplitudeArray);
+      this.drawTimeDomain();
     };
 
     bufferSource.start(0);
@@ -33,6 +33,41 @@ export default class ApplicationController extends Controller {
       console.log('analysed');
     };
     offline.startRendering();
+  }
+
+  @action
+  drawTimeDomain() {
+    var minValue = 9999999;
+    var maxValue = 0;
+    const ctx = document.getElementById('canvas').getContext('2d');
+
+    for (var i = 0; i < this.amplitudeArray.length; i++) {
+      var value = this.amplitudeArray[i] / 256;
+      if (value > maxValue) {
+        maxValue = value;
+      } else if (value < minValue) {
+        minValue = value;
+      }
+    }
+
+    var y_lo = this.canvasHeight - this.canvasHeight * minValue - 1;
+    var y_hi = this.canvasHeight - this.canvasHeight * maxValue - 1;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(this.column, y_lo, 1, y_hi - y_lo);
+
+    // loop around the canvas when we reach the end
+    this.column += 1;
+    if (this.column >= this.canvasWidth) {
+      this.column = 0;
+      this.clearCanvas();
+    }
+  }
+
+  @action
+  clearCanvas() {
+    const ctx = document.getElementById('canvas').getContext('2d');
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 
   /**
