@@ -1,0 +1,18 @@
+<AnimatedContainer class="flex w-full">
+  <div class="flex w-full">
+    {{#animated-if @barkType use=transition duration=1000}}
+      <div class="mr-4">
+        {{svg-jar @barkType height="200" width="200"}}
+      </div>
+      <div class="flex-grow">
+        <h2 class="font-bold text-3xl">
+          {{capitalize @barkType}}
+        </h2>
+
+        <p>
+          {{@barkDescription}}
+        </p>
+      </div>
+    {{/animated-if}}
+  </div>
+</AnimatedContainer>

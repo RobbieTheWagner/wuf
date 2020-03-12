@@ -1,10 +1,24 @@
 import Service from '@ember/service';
 import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+
+const barkDescriptions = {
+  alert:
+    'Your dog may be alerting you to a potential problem or intruder nearby.',
+  distress: 'Your dog may be in pain or scared.',
+  greeting: 'Your dog is saying hello!',
+  playful: 'Your dog wants to play!'
+};
 
 export default class AudioAnalyzerService extends Service {
+  @tracked barkType;
   canvasWidth = 800;
   canvasHeight = 256;
   column = 0;
+
+  get barkDescription() {
+    return barkDescriptions[this.barkType];
+  }
 
   /**
    * Analyze the audio data and provide vizualizations
@@ -23,13 +37,29 @@ export default class AudioAnalyzerService extends Service {
     scp.connect(offline.destination); // this is necessary for the script processor to start
 
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
+    this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
+      analyser.getByteFrequencyData(this.frequencyArray);
+      this.determineBarkType();
       this.drawTimeDomain();
+      debugger;
     };
 
     bufferSource.start(0);
     offline.startRendering();
+  }
+
+  @action
+  clearCanvas() {
+    const ctx = document.getElementById('canvas').getContext('2d');
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  }
+
+  @action
+  determineBarkType() {
+    this.barkType = 'alert';
   }
 
   @action
@@ -61,18 +91,13 @@ export default class AudioAnalyzerService extends Service {
     }
   }
 
-  @action
-  clearCanvas() {
-    const ctx = document.getElementById('canvas').getContext('2d');
-    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-  }
-
   /**
    * Upload audio/video files and trigger analyseAudio
    * @param {*} file
    */
   @action
   async uploadAudioVideo(file) {
+    this.barkType = null;
     const fileReader = new FileReader();
     fileReader.onload = async ev => {
       this.audioContext = new AudioContext();

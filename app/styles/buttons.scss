@@ -1,0 +1,8 @@
+.btn {
+  @apply bg-gray-600 mr-2 pb-2 pl-4 pr-4 pt-2 text-gray-200;
+  transition: background, background-color, color 0.5s;
+}
+
+.btn:hover {
+  @apply bg-gray-400 text-gray-900;
+}

@@ -11,12 +11,22 @@
         />
       </div>
 
+      <BarkType
+        @barkType={{this.audioAnalyzer.barkType}}
+        @barkDescription={{this.audioAnalyzer.barkDescription}}
+      />
+
       <div class="mb-2 mt-2">
         <h2 class="font-bold text-2xl">
           Visualization
         </h2>
 
-        <canvas class="bg-gray-800" id="canvas" width="800" height="256"></canvas>
+        <canvas
+          class="bg-gray-800"
+          id="canvas"
+          width="800"
+          height="256"
+        ></canvas>
       </div>
     </div>
   </div>
