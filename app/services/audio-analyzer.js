@@ -2,6 +2,7 @@ import Service from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { mean, median, mode } from 'wuf/utils/statistics';
+import { determineBarkPitch } from 'wuf/utils/barks';
 
 const barkDescriptions = {
   alert:
@@ -17,8 +18,8 @@ export default class AudioAnalyzerService extends Service {
   canvasHeight = 256;
   column = 0;
 
-  amplitudeData = [];
-  frequencyData = [];
+  loudness = [];
+  pitches = [];
 
   get barkDescription() {
     return barkDescriptions[this.barkType];
@@ -48,23 +49,25 @@ export default class AudioAnalyzerService extends Service {
     scp.connect(offline.destination); // this is necessary for the script processor to start
 
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
+    // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
 
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
 
-      this.amplitudeData.push({
+      // Since dog barks range from 250-4000 Hz, we should exclude any buckets above 4000 Hz
+      // This means we only need the first 12 buckets, which should cover ~0-4140 Hz
+      const dogRangeFrequencyArray = this.frequencyArray.slice(0, 12);
+      const pitch = determineBarkPitch(dogRangeFrequencyArray);
+
+      this.loudness.push({
         mean: mean(this.amplitudeArray),
         median: median(this.amplitudeArray),
         mode: mode(this.amplitudeArray)
       });
 
-      this.frequencyData.push({
-        mean: mean(this.frequencyArray),
-        median: median(this.frequencyArray),
-        mode: mode(this.frequencyArray)
-      });
+      this.pitches.push(pitch);
 
       this.drawTimeDomain();
     };
@@ -81,8 +84,7 @@ export default class AudioAnalyzerService extends Service {
 
   @action
   determineBarkType() {
-    const { amplitudeArray, frequencyArray } = this;
-    this.barkType = 'play';
+    this.barkType = 'playful';
   }
 
   @action
