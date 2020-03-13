@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { mean, median, mode } from 'wuf/utils/statistics';
 
 const barkDescriptions = {
   alert:
@@ -16,6 +17,9 @@ export default class AudioAnalyzerService extends Service {
   canvasHeight = 256;
   column = 0;
 
+  amplitudeData = [];
+  frequencyData = [];
+
   get barkDescription() {
     return barkDescriptions[this.barkType];
   }
@@ -26,12 +30,19 @@ export default class AudioAnalyzerService extends Service {
    */
   @action
   async analyseAudio(buffer) {
+    // 44100 hz is the sample rate equivalent to CD audio
     const offline = new OfflineAudioContext(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
+    bufferSource.onended = () => {
+      debugger;
+      this.determineBarkType();
+    };
     bufferSource.buffer = buffer;
 
-    var analyser = offline.createAnalyser();
-    var scp = offline.createScriptProcessor(1024, 0, 1);
+    const analyser = offline.createAnalyser();
+    // fftSize of 128 means we will have 64 for frequencyBinCount
+    analyser.fftSize = 128;
+    const scp = offline.createScriptProcessor(1024, 0, 1);
 
     bufferSource.connect(analyser);
     scp.connect(offline.destination); // this is necessary for the script processor to start
@@ -42,9 +53,20 @@ export default class AudioAnalyzerService extends Service {
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
-      this.determineBarkType();
+
+      this.amplitudeData.push({
+        mean: mean(this.amplitudeArray),
+        median: median(this.amplitudeArray),
+        mode: mode(this.amplitudeArray)
+      });
+
+      this.frequencyData.push({
+        mean: mean(this.frequencyArray),
+        median: median(this.frequencyArray),
+        mode: mode(this.frequencyArray)
+      });
+
       this.drawTimeDomain();
-      debugger;
     };
 
     bufferSource.start(0);
@@ -59,7 +81,8 @@ export default class AudioAnalyzerService extends Service {
 
   @action
   determineBarkType() {
-    this.barkType = 'alert';
+    const { amplitudeArray, frequencyArray } = this;
+    this.barkType = 'play';
   }
 
   @action
