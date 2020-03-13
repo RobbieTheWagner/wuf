@@ -1,8 +1,7 @@
 import Service from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { mean, median, mode } from 'wuf/utils/statistics';
-import { determineBarkPitch } from 'wuf/utils/barks';
+import { determineBarkOccurred, determineBarkPitch, getTimeDomainMaxMin } from 'wuf/utils/barks';
 
 const barkDescriptions = {
   alert:
@@ -56,17 +55,15 @@ export default class AudioAnalyzerService extends Service {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
 
+      debugger;
+
       // Since dog barks range from 250-4000 Hz, we should exclude any buckets above 4000 Hz
       // This means we only need the first 12 buckets, which should cover ~0-4140 Hz
       const dogRangeFrequencyArray = this.frequencyArray.slice(0, 12);
       const pitch = determineBarkPitch(dogRangeFrequencyArray);
+      const barkOccurred = determineBarkOccurred(this.amplitudeArray);
 
-      this.loudness.push({
-        mean: mean(this.amplitudeArray),
-        median: median(this.amplitudeArray),
-        mode: mode(this.amplitudeArray)
-      });
-
+      this.barksOccurred.push(barkOccurred);
       this.pitches.push(pitch);
 
       this.drawTimeDomain();
@@ -89,18 +86,9 @@ export default class AudioAnalyzerService extends Service {
 
   @action
   drawTimeDomain() {
-    var minValue = 9999999;
-    var maxValue = 0;
     const ctx = document.getElementById('canvas').getContext('2d');
 
-    for (var i = 0; i < this.amplitudeArray.length; i++) {
-      var value = this.amplitudeArray[i] / 256;
-      if (value > maxValue) {
-        maxValue = value;
-      } else if (value < minValue) {
-        minValue = value;
-      }
-    }
+  const {minValue, maxValue} = getTimeDomainMaxMin();
 
     var y_lo = this.canvasHeight - this.canvasHeight * minValue - 1;
     var y_hi = this.canvasHeight - this.canvasHeight * maxValue - 1;
