@@ -1,7 +1,12 @@
 import Service from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { determineBarkOccurred, determineBarkPitch, getTimeDomainMaxMin } from 'wuf/utils/barks';
+import {
+  determineBarkOccurred,
+  determineBarkPitch,
+  determineBarkType,
+  getTimeDomainMaxMin
+} from 'wuf/utils/barks';
 
 const barkDescriptions = {
   alert:
@@ -17,7 +22,7 @@ export default class AudioAnalyzerService extends Service {
   canvasHeight = 256;
   column = 0;
 
-  loudness = [];
+  barksOccurred = [];
   pitches = [];
 
   get barkDescription() {
@@ -34,8 +39,7 @@ export default class AudioAnalyzerService extends Service {
     const offline = new OfflineAudioContext(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
     bufferSource.onended = () => {
-      debugger;
-      this.determineBarkType();
+      this.barkType = determineBarkType(this.barksOccurred, this.pitches);
     };
     bufferSource.buffer = buffer;
 
@@ -54,8 +58,6 @@ export default class AudioAnalyzerService extends Service {
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
-
-      debugger;
 
       // Since dog barks range from 250-4000 Hz, we should exclude any buckets above 4000 Hz
       // This means we only need the first 12 buckets, which should cover ~0-4140 Hz
@@ -80,15 +82,10 @@ export default class AudioAnalyzerService extends Service {
   }
 
   @action
-  determineBarkType() {
-    this.barkType = 'playful';
-  }
-
-  @action
   drawTimeDomain() {
     const ctx = document.getElementById('canvas').getContext('2d');
 
-  const {minValue, maxValue} = getTimeDomainMaxMin();
+    const { minValue, maxValue } = getTimeDomainMaxMin(this.amplitudeArray);
 
     var y_lo = this.canvasHeight - this.canvasHeight * minValue - 1;
     var y_hi = this.canvasHeight - this.canvasHeight * maxValue - 1;

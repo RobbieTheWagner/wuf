@@ -71,3 +71,10 @@ export function mode(numbers) {
 
   return modes;
 }
+
+export function modeString(arr){
+  return arr.sort((a,b) =>
+        arr.filter(v => v===a).length
+      - arr.filter(v => v===b).length
+  ).pop();
+}
