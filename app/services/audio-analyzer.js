@@ -55,6 +55,9 @@ export default class AudioAnalyzerService extends Service {
     // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
 
+    this.barksOccurred = [];
+    this.pitches = [];
+    
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);

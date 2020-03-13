@@ -84,7 +84,11 @@ export function determineBarkType(barksOccuredData, pitchData) {
   if (barks.length > 2) {
     const mostFrequentlyOccuringPitch = modeString(barks);
 
-    if (mostFrequentlyOccuringPitch === 'mid') {
+    if (mostFrequentlyOccuringPitch === 'low') {
+      if(barks.includes('mid')){
+        return 'playful';
+      }
+
       return 'alert';
     }
 
