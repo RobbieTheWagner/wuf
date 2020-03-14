@@ -104,14 +104,14 @@ export default class AudioAnalyzerService extends Service {
 
     const { minValue, maxValue } = getTimeDomainMaxMin(this.amplitudeArray);
 
-    var y_lo = canvasHeight - canvasHeight * minValue - 0.5;
-    var y_hi = canvasHeight - canvasHeight * maxValue - 0.5;
+    var y_lo = canvasHeight - canvasHeight * minValue - 1;
+    var y_hi = canvasHeight - canvasHeight * maxValue - 1;
 
     ctx.fillStyle = '#6FFFE9';
-    ctx.fillRect(this.column, y_lo, 0.5, y_hi - y_lo);
+    ctx.fillRect(this.column, y_lo, 1, y_hi - y_lo);
 
     // loop around the canvas when we reach the end
-    this.column += 0.5;
+    this.column += 1;
     if (this.column >= canvasWidth) {
       this.column = 0;
       this.clearCanvas();
@@ -125,6 +125,7 @@ export default class AudioAnalyzerService extends Service {
   @action
   async uploadAudioVideo(file) {
     this.clearBarkData();
+    this.clearCanvas();
     const fileReader = new FileReader();
     fileReader.onload = async ev => {
       this.audioContext = new AudioContext();
