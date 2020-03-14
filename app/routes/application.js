@@ -9,7 +9,7 @@ export default class ApplicationRoute extends Route {
     super(...arguments);
     
     this.router.on('routeDidChange', () => {
-      this.audioAnalyzer.barkType = null;
+      this.audioAnalyzer.clearBarkData();
     });
   }
 

@@ -18,10 +18,9 @@ const barkDescriptions = {
 
 export default class AudioAnalyzerService extends Service {
   @tracked barkType;
+  @tracked barksOccurred = [];
+  @tracked pitches = [];
   column = 0;
-
-  barksOccurred = [];
-  pitches = [];
 
   get barkDescription() {
     return barkDescriptions[this.barkType];
@@ -33,7 +32,6 @@ export default class AudioAnalyzerService extends Service {
    */
   @action
   async analyseAudio(buffer) {
-    this.column = 0;
     // 44100 hz is the sample rate equivalent to CD audio
     const offline = new OfflineAudioContext(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
@@ -53,9 +51,6 @@ export default class AudioAnalyzerService extends Service {
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
     // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
-
-    this.barksOccurred = [];
-    this.pitches = [];
     
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
@@ -77,6 +72,17 @@ export default class AudioAnalyzerService extends Service {
     offline.startRendering();
   }
 
+  /**
+   * Resets the barkType, barksOccurred, and pitches for a fresh run
+   */
+  @action
+  clearBarkData(){
+    this.barkType = null;
+    this.barksOccurred = [];
+    this.column = 0;
+    this.pitches = [];
+  }
+
   @action
   clearCanvas() {
     const canvas = document.getElementById('canvas');
@@ -86,6 +92,9 @@ export default class AudioAnalyzerService extends Service {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   }
 
+  /**
+   * Draws a visualization of the time domain data
+   */
   @action
   drawTimeDomain() {
     const canvas = document.getElementById('canvas');
@@ -115,7 +124,7 @@ export default class AudioAnalyzerService extends Service {
    */
   @action
   async uploadAudioVideo(file) {
-    this.barkType = null;
+    this.clearBarkData();
     const fileReader = new FileReader();
     fileReader.onload = async ev => {
       this.audioContext = new AudioContext();
