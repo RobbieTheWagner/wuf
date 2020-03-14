@@ -1,4 +1,4 @@
-<FileDropzone @name="audio" as |dropzone|>
+<FileDropzone class="border border-dashed bg-gray-100 p-4 rounded" @name="audio" as |dropzone|>
   {{#if dropzone.active}}
     {{#if dropzone.valid}}
       Drop to upload
@@ -6,7 +6,7 @@
       Invalid
     {{/if}}
   {{else}}
-    <h4>
+    <h4 class="text-heading">
       Upload Audio/Video
     </h4>
     <p>
@@ -19,7 +19,7 @@
         @multiple={{false}}
         @onfileadd={{@uploadAudioVideo}}
       >
-        <a class="cursor-pointer underline" id="upload-audio" tabindex="0">
+        <a class="cursor-pointer text-btn underline" id="upload-audio" tabindex="0">
           Add audio/video.
         </a>
       </FileUpload>

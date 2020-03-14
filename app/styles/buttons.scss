@@ -1,8 +1,8 @@
 .btn {
-  @apply bg-gray-600 mr-2 pb-2 pl-4 pr-4 pt-2 text-gray-200;
-  transition: background, background-color, color 0.5s;
+  @apply bg-btn flex font-semibold items-center justify-center pb-4 pl-8 pr-8 pt-4 rounded-full text-center text-white uppercase w-full;
+  transition: all 0.25s;
 }
 
 .btn:hover {
-  @apply bg-gray-400 text-gray-900;
+  @apply bg-btn-hover text-main;
 }

@@ -97,7 +97,7 @@ export default class AudioAnalyzerService extends Service {
     ctx.fillRect(this.column, y_lo, 1, y_hi - y_lo);
 
     // loop around the canvas when we reach the end
-    this.column += 1;
+    this.column += 2;
     if (this.column >= this.canvasWidth) {
       this.column = 0;
       this.clearCanvas();

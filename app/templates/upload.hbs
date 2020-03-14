@@ -1,20 +1,30 @@
 <div class="flex flex-wrap justify-center p-8 w-full">
   <div class="max-w-6xl w-full">
     <div class="flex flex-wrap items-center w-full">
-      <div class="mb-2 mt-2 w-full">
-        <h2 class="font-bold text-2xl">
-          Files
+      <div class="mb-2 mt-2 w-full lg:w-1/2">
+        <h4 class="font-semibold p-2 text-alt text-center uppercase lg:text-left">
+          Want to know
+        </h4>
+
+        <h2 class="font-bold p-2 text-center text-heading text-3xl lg:text-left">
+          What your dog said?
         </h2>
+
+        <div class="flex justify-center">
+          {{svg-jar "house" class="h-auto max-w-sm w-full"}}
+        </div>
 
         <AudioUploader
           @uploadAudioVideo={{this.audioAnalyzer.uploadAudioVideo}}
         />
       </div>
 
-      <BarkType
-        @barkType={{this.audioAnalyzer.barkType}}
-        @barkDescription={{this.audioAnalyzer.barkDescription}}
-      />
+      <div class="w-full lg:w-1/2">
+        <BarkType
+          @barkType={{this.audioAnalyzer.barkType}}
+          @barkDescription={{this.audioAnalyzer.barkDescription}}
+        />
+      </div>
 
       <div class="mb-2 mt-2">
         <h2 class="font-bold text-2xl">

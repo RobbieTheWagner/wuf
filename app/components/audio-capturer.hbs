@@ -1,15 +1,15 @@
 <button
-  class="btn"
+  class="btn mb-4"
   type="button"
   {{on "click" this.startRecording}}
 >
-  Start
+  {{svg-jar "mic" class="mr-2"}} Start recording
 </button>
 
 <button
-  class="btn"
+  class="btn mb-4"
   type="button"
   {{on "click" this.stopRecording}}
 >
-  Stop
+  {{svg-jar "stop-circle" class="mr-2"}} Stop recording
 </button>

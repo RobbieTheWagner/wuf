@@ -5,7 +5,7 @@
         <div class="inline-block">
           {{svg-jar "wuf" class="-mt-2 p-2" height="60" width="60"}}
         </div>
-        <div class="text-3xl">
+        <div class="font-black text-heading text-3xl">
           Wüf
         </div>
       </a>
@@ -16,7 +16,7 @@
         aria-label="Open navigation menu"
         class="flex items-center px-3 py-2 text-grey hover:text-navy text-xl"
         type="button"
-        {{on "click" (fn this.toggleNavMenu false)}}
+        {{on "click" (fn this.toggleNavMenu true)}}
       >
         {{svg-jar "menu" height="36px" width="36px"}}
       </button>
@@ -37,7 +37,7 @@
         <LinkTo
           class="nav-link"
           @route="index"
-          @invokeAction={{fn this.toggleNavMenu false}}
+          {{on "click" (fn this.toggleNavMenu false)}}
         >
           Home
         </LinkTo>
@@ -45,7 +45,7 @@
         <LinkTo
           class="nav-link"
           @route="upload"
-          @invokeAction={{fn this.toggleNavMenu false}}
+          {{on "click" (fn this.toggleNavMenu false)}}
         >
           File Upload
         </LinkTo>
@@ -53,7 +53,7 @@
         <LinkTo
           class="nav-link"
           @route="microphone"
-          @invokeAction={{fn this.toggleNavMenu false}}
+          {{on "click" (fn this.toggleNavMenu false)}}
         >
           Microphone
         </LinkTo>

@@ -1,4 +1,4 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
 export default class NavMenuComponent extends Component {
@@ -8,7 +8,7 @@ export default class NavMenuComponent extends Component {
    */
   @action
   toggleNavMenu(open) {
-    const navLinks = this.element.querySelector('.nav-links');
+    const navLinks = document.querySelector('.nav-links');
 
     if (open) {
       navLinks.classList.remove('hidden');
