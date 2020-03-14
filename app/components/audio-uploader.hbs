@@ -1,28 +1,37 @@
-<FileDropzone class="border border-dashed bg-gray-100 p-4 rounded" @name="audio" as |dropzone|>
-  {{#if dropzone.active}}
-    {{#if dropzone.valid}}
-      Drop to upload
-    {{else}}
-      Invalid
-    {{/if}}
-  {{else}}
-    <h4 class="text-heading">
-      Upload Audio/Video
-    </h4>
-    <p>
-      {{#if dropzone.supported}}
-        Drag and drop audio/video files onto this area to upload them or
+<div class="bg-gray-100 border border-dashed flex h-32 items-center p-4 rounded">
+  <FileDropzone
+    class="flex flex-col justify-center h-full w-full"
+    @name="audio" as |dropzone|
+  >
+    {{#if dropzone.active}}
+      {{#if dropzone.valid}}
+        Drop to upload
+      {{else}}
+        Invalid
       {{/if}}
-      <FileUpload
-        @name="audio"
-        @accept="audio/*,video/*"
-        @multiple={{false}}
-        @onfileadd={{@uploadAudioVideo}}
-      >
-        <a class="cursor-pointer text-btn underline" id="upload-audio" tabindex="0">
-          Add audio/video.
-        </a>
-      </FileUpload>
-    </p>
-  {{/if}}
-</FileDropzone>
+    {{else}}
+      <h4 class="text-heading">
+        Upload Audio/Video
+      </h4>
+      <p>
+        {{#if dropzone.supported}}
+          Drag and drop audio/video files onto this area to upload them or
+        {{/if}}
+        <FileUpload
+          @name="audio"
+          @accept="audio/*,video/*"
+          @multiple={{false}}
+          @onfileadd={{@uploadAudioVideo}}
+        >
+          <a
+            class="cursor-pointer text-btn underline"
+            id="upload-audio"
+            tabindex="0"
+          >
+            Add audio/video.
+          </a>
+        </FileUpload>
+      </p>
+    {{/if}}
+  </FileDropzone>
+</div>

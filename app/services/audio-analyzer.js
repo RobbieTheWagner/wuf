@@ -18,8 +18,6 @@ const barkDescriptions = {
 
 export default class AudioAnalyzerService extends Service {
   @tracked barkType;
-  canvasWidth = 800;
-  canvasHeight = 256;
   column = 0;
 
   barksOccurred = [];
@@ -35,6 +33,7 @@ export default class AudioAnalyzerService extends Service {
    */
   @action
   async analyseAudio(buffer) {
+    this.column = 0;
     // 44100 hz is the sample rate equivalent to CD audio
     const offline = new OfflineAudioContext(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
@@ -80,25 +79,31 @@ export default class AudioAnalyzerService extends Service {
 
   @action
   clearCanvas() {
-    const ctx = document.getElementById('canvas').getContext('2d');
-    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    const canvas = document.getElementById('canvas');
+    const canvasHeight = canvas.clientHeight;
+    const canvasWidth = canvas.clientWidth;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   }
 
   @action
   drawTimeDomain() {
-    const ctx = document.getElementById('canvas').getContext('2d');
+    const canvas = document.getElementById('canvas');
+    const canvasHeight = canvas.clientHeight;
+    const canvasWidth = canvas.clientWidth;
+    const ctx = canvas.getContext('2d');
 
     const { minValue, maxValue } = getTimeDomainMaxMin(this.amplitudeArray);
 
-    var y_lo = this.canvasHeight - this.canvasHeight * minValue - 1;
-    var y_hi = this.canvasHeight - this.canvasHeight * maxValue - 1;
+    var y_lo = canvasHeight - canvasHeight * minValue - 0.5;
+    var y_hi = canvasHeight - canvasHeight * maxValue - 0.5;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(this.column, y_lo, 1, y_hi - y_lo);
+    ctx.fillStyle = '#6FFFE9';
+    ctx.fillRect(this.column, y_lo, 0.5, y_hi - y_lo);
 
     // loop around the canvas when we reach the end
-    this.column += 2;
-    if (this.column >= this.canvasWidth) {
+    this.column += 0.5;
+    if (this.column >= canvasWidth) {
       this.column = 0;
       this.clearCanvas();
     }
