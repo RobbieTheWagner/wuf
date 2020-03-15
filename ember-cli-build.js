@@ -25,7 +25,9 @@ module.exports = function(defaults) {
     },
     prember: {
       urls: [
-        '/'
+        '/',
+        '/microphone/',
+        '/upload/'
       ]
     }
   });
