@@ -1,27 +1,20 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { Plugins } from "@capacitor/core";
+const { VoiceRecorder } = Plugins;
+import { Base64Binary } from 'wuf/utils/base64Binary';
 
 export default class AudioCapturerComponent extends Component {
   @action
   async startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: false
-    });
-    const options = { mimeType: 'audio/webm' };
-    this.mediaRecorder = new MediaRecorder(stream, options);
-
-    this.mediaRecorder.addEventListener('dataavailable', e => {
-      this.args.uploadAudioVideo({ blob: e.data });
-    });
-
-    this.mediaRecorder.start();
+    await VoiceRecorder.startRecording();
   }
 
   @action
-  stopRecording() {
-    if (this.mediaRecorder) {
-      this.mediaRecorder.stop();
-    }
+  async stopRecording() {
+      let result = await VoiceRecorder.stopRecording();
+      let byteArray = Base64Binary.decodeArrayBuffer(result.value.recordDataBase64);
+
+      this.args.uploadAudioVideo(byteArray);
   }
 }
