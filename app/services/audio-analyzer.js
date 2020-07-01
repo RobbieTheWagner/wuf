@@ -7,6 +7,8 @@ import {
   determineBarkType,
   getTimeDomainMaxMin
 } from 'wuf/utils/barks';
+import { Plugins } from "@capacitor/core";
+const { Device } = Plugins;
 
 const barkDescriptions = {
   alert:
@@ -123,14 +125,25 @@ export default class AudioAnalyzerService extends Service {
    * @param {*} file
    */
   @action
-  async uploadAudioVideo(byteArray) {
+  async uploadAudioVideo(data) {
     this.clearBarkData();
     this.clearCanvas();
+    const deviceInfo = await Device.getInfo();
 
-    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (deviceInfo.operatingSystem === "ios") {
+      let audioCtx = new window.webkitAudioContext();
 
-    audioCtx.decodeAudioData(byteArray, (buffer) => {
-      this.analyseAudio(buffer);
-    }, function(err) { console.log("err(decodeAudioData): "+err); });
+      audioCtx.decodeAudioData(data, (buffer) => {
+        this.analyseAudio(buffer);
+      }, function(err) { console.log("err(decodeAudioData): "+err); });
+    } else {
+      const fileReader = new FileReader();
+      fileReader.onload = async ev => {
+        this.audioContext = new AudioContext();
+        const buffer = await this.audioContext.decodeAudioData(ev.target.result);
+        this.analyseAudio(buffer);
+      };
+      return fileReader.readAsArrayBuffer(data.blob);
+    }
   }
 }
