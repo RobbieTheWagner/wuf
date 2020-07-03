@@ -8,6 +8,9 @@
 body {
   @apply text-main;
   font-family: 'Poppins', sans-serif;
+  padding: 12px;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .animated-container {
