@@ -1526,13 +1526,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.10.3":
-  version "7.10.4"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.4.tgz#a6724f1a6b8d2f6ea5236dbfe58c7d7ea9c5eb99"
-  integrity sha512-UpTN5yUJr9b4EX2CnGNWIvER7Ab83ibv0pcvvHc4UOdrBI5jb8bj+32cCwPX6xu0mt2daFNjYhoi+X7beH0RSw==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.8.4":
   version "7.8.7"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.8.7.tgz#8fefce9802db54881ba59f90bb28719b4996324d"
@@ -2566,14 +2559,6 @@ atob@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
-
-automation-events@^2.0.13:
-  version "2.0.13"
-  resolved "https://registry.yarnpkg.com/automation-events/-/automation-events-2.0.13.tgz#103b8332c97371b60a3c9ce3ca8ff63317cdf3e8"
-  integrity sha512-MVlkEM8gmV56Z3Dtg1n3URhXTg9miGVkUpSejRaim2cGN32qbeukESAVanXl8DQ4S7YdJwxaP1EYnhEXl+5CAw==
-  dependencies:
-    "@babel/runtime" "^7.10.3"
-    tslib "^2.0.0"
 
 autoprefixer@^9.4.5:
   version "9.7.4"
@@ -4922,21 +4907,6 @@ copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
-
-cordova-plugin-audioinput@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-audioinput/-/cordova-plugin-audioinput-1.0.2.tgz#9c40afbca24919c79668ba28aefabe8135048772"
-  integrity sha512-uDY41lWDGyTFOEW1O5VPkkspkVIGDI3ZXZMR48kb7IS7FIOMA+xiLQ0s7wb3a+LZz/1nVdBkco2aq4JSSyQ+rA==
-
-cordova-plugin-file@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-6.0.2.tgz#f3911479f8357e9aacb5576674f8d95b31a1fb20"
-  integrity sha512-m7cughw327CjONN/qjzsTpSesLaeybksQh420/gRuSXJX5Zt9NfgsSbqqKDon6jnQ9Mm7h7imgyO2uJ34XMBtA==
-
-cordova-plugin-media@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-media/-/cordova-plugin-media-5.0.3.tgz#366188bd4f8472651c1e8304be649af6333b0e36"
-  integrity sha512-UQPFlpk1zL4BY44zGi8RVmYCvcKBCN4Dyf8ovxqGYCC8zR1yhbTRWYDdO9vJdERwbfgWV7+z7FMWiSUfqWm9bQ==
 
 core-js-compat@^3.6.2:
   version "3.6.4"
@@ -11417,15 +11387,6 @@ stagehand@^1.0.0:
   dependencies:
     debug "^4.1.0"
 
-standardized-audio-context@^24.1.20:
-  version "24.1.20"
-  resolved "https://registry.yarnpkg.com/standardized-audio-context/-/standardized-audio-context-24.1.20.tgz#ffc6071a3df83d106ff00e2274710d8b394ebf7d"
-  integrity sha512-Fm9PXVNIRDZhu40DOn1T/2Ve1/I2W5caSPksRDWYhyctDlJM+/+w8CO/0Qxpoy1Gb0R4fHMnr6Kbo2oOq4+nww==
-  dependencies:
-    "@babel/runtime" "^7.10.3"
-    automation-events "^2.0.13"
-    tslib "^2.0.0"
-
 static-extend@^0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/static-extend/-/static-extend-0.1.2.tgz#60809c39cbff55337226fd5e0b520f341f1fb5c6"
@@ -12009,11 +11970,6 @@ tslib@^1.10.0, tslib@^1.9.0:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
   integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
-
-tslib@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.0.tgz#18d13fc2dce04051e20f074cc8387fd8089ce4f3"
-  integrity sha512-lTqkx847PI7xEDYJntxZH89L2/aXInsyF2luSafe/+0fHOMjlBNXdH6th7f70qxLDhul7KZK0zC8V5ZIyHl0/g==
 
 tty-browserify@0.0.0:
   version "0.0.0"
