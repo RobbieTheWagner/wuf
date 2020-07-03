@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { Plugins } from "@capacitor/core";
+import { Plugins } from '@capacitor/core';
 const { VoiceRecorder, Device } = Plugins;
 import { Base64Binary } from 'wuf/utils/base64Binary';
 
@@ -9,7 +9,7 @@ export default class AudioCapturerComponent extends Component {
   async startRecording() {
     const deviceInfo = await Device.getInfo();
 
-    if (deviceInfo.operatingSystem === "ios") {
+    if (deviceInfo.operatingSystem === 'ios') {
       const canRecord = await VoiceRecorder.canDeviceVoiceRecord();
       if (canRecord) {
         await VoiceRecorder.startRecording();
@@ -17,8 +17,6 @@ export default class AudioCapturerComponent extends Component {
         const permissionGranted = await VoiceRecorder.requestAudioRecordingPermission();
         if (permissionGranted) {
           await VoiceRecorder.startRecording();
-        } else {
-          console.log('Permission to microphone not granted.');
         }
       }
     } else {
@@ -41,7 +39,7 @@ export default class AudioCapturerComponent extends Component {
   async stopRecording() {
     const deviceInfo = await Device.getInfo();
 
-    if (deviceInfo.operatingSystem === "ios") {
+    if (deviceInfo.operatingSystem === 'ios') {
       let result = await VoiceRecorder.stopRecording();
       let byteArray = Base64Binary.decodeArrayBuffer(result.value.recordDataBase64);
 
