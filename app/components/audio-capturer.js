@@ -12,8 +12,6 @@ export default class AudioCapturerComponent extends Component {
     if (deviceInfo.operatingSystem === 'ios') {
       const canRecord = await VoiceRecorder.canDeviceVoiceRecord();
       if (canRecord) {
-        await VoiceRecorder.startRecording();
-      } else {
         const permissionGranted = await VoiceRecorder.requestAudioRecordingPermission();
         if (permissionGranted) {
           await VoiceRecorder.startRecording();

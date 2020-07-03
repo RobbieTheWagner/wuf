@@ -35,7 +35,7 @@ export default class AudioAnalyzerService extends Service {
   @action
   async analyseAudio(buffer) {
     // 44100 hz is the sample rate equivalent to CD audio
-    const offline = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, buffer.length, 44100);
+    const offline = new (OfflineAudioContext || window.webkitOfflineAudioContext)(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
     bufferSource.onended = () => {
       this.barkType = determineBarkType(this.barksOccurred, this.pitches);
