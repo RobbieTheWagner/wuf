@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { Plugins } from '@capacitor/core';
+import { Plugins, FilesystemEncoding } from '@capacitor/core';
 const { VoiceRecorder, Device, Filesystem } = Plugins;
 import { File } from '@ionic-native/file';
 import { Media } from '@ionic-native/media';
@@ -15,10 +15,10 @@ export default class AudioCapturerComponent extends Component {
       if (canRecord) {
         const permissionGranted = await VoiceRecorder.requestAudioRecordingPermission();
         if (permissionGranted) {
-          File.createFile(File.tempDirectory, `${Date.now()}_wuf_audio_recording.m4a`, true).then(() => {
-            this.file = Media.create(File.tempDirectory.replace(/^file:\/\//, '') + `${Date.now()}_wuf_audio_recording.m4a`);
-            this.file.startRecord();
-          });
+          const fileName = `${Date.now()}_wuf_audio_recording.m4a`;
+          await File.createFile(File.tempDirectory, fileName, true);
+          this.file = Media.create(File.tempDirectory.replace(/^file:\/\//, '') + fileName);
+          this.file.startRecord();
         }
       }
     } else {
@@ -44,13 +44,13 @@ export default class AudioCapturerComponent extends Component {
     if (deviceInfo.operatingSystem === 'ios') {
       this.file.stopRecord();
 
-      let { data } = await Filesystem.readFile({
-        path: `file://${this.file._objectInstance.src}`
+      const { data } = await Filesystem.readFile({
+        path: `file://${this.file._objectInstance.src}`,
       });
+      const buffer = Uint8Array.from(window.atob(data), c => c.charCodeAt(0)).buffer;
+      const blob = new Blob([buffer], { type : 'audio/m4a' });
 
-      let buffer = Uint8Array.from(window.atob(data), c => c.charCodeAt(0)).buffer;
-
-      this.args.uploadAudioVideo(buffer);
+      this.args.uploadAudioVideo(blob);
     } else {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
