@@ -1,8 +1,9 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { Plugins } from '@capacitor/core';
-const { VoiceRecorder, Device } = Plugins;
-import { Base64Binary } from 'wuf/utils/base64Binary';
+const { VoiceRecorder, Device, Filesystem } = Plugins;
+import { File } from '@ionic-native/file';
+import { Media } from '@ionic-native/media';
 
 export default class AudioCapturerComponent extends Component {
   @action
@@ -14,7 +15,10 @@ export default class AudioCapturerComponent extends Component {
       if (canRecord) {
         const permissionGranted = await VoiceRecorder.requestAudioRecordingPermission();
         if (permissionGranted) {
-          await VoiceRecorder.startRecording();
+          File.createFile(File.tempDirectory, `${Date.now()}_wuf_audio_recording.m4a`, true).then(() => {
+            this.file = Media.create(File.tempDirectory.replace(/^file:\/\//, '') + `${Date.now()}_wuf_audio_recording.m4a`);
+            this.file.startRecord();
+          });
         }
       }
     } else {
@@ -26,7 +30,7 @@ export default class AudioCapturerComponent extends Component {
       this.mediaRecorder = new MediaRecorder(stream, options);
 
       this.mediaRecorder.addEventListener('dataavailable', e => {
-        this.args.uploadAudioVideo({ blob: e.data });
+        this.args.uploadAudioVideo(e.data);
       });
 
       this.mediaRecorder.start();
@@ -38,10 +42,15 @@ export default class AudioCapturerComponent extends Component {
     const deviceInfo = await Device.getInfo();
 
     if (deviceInfo.operatingSystem === 'ios') {
-      let result = await VoiceRecorder.stopRecording();
-      let byteArray = Base64Binary.decodeArrayBuffer(result.value.recordDataBase64);
+      this.file.stopRecord();
 
-      this.args.uploadAudioVideo(byteArray);
+      let { data } = await Filesystem.readFile({
+        path: `file://${this.file._objectInstance.src}`
+      });
+
+      let buffer = Uint8Array.from(window.atob(data), c => c.charCodeAt(0)).buffer;
+
+      this.args.uploadAudioVideo(buffer);
     } else {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();

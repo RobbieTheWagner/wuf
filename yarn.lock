@@ -1621,10 +1621,17 @@
     which "^1.3.0"
     xml2js "^0.4.19"
 
-"@capacitor/core@^2.2.0", "@capacitor/core@latest":
+"@capacitor/core@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-2.2.0.tgz#60f7b2126a5a223cb1ede055a65df6ad0d719f4b"
   integrity sha512-ClxXjOUCF0wZpznZI6f6uXK2LLzWBx5Ly/g7Hqu8R8wNdaKYoh83eMuT+m5G1gfxhcALAAJNUhHccnCW3ohftg==
+  dependencies:
+    tslib "^1.9.0"
+
+"@capacitor/core@latest":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-2.2.1.tgz#20f07d35c4af3650eed90cbfd0d5c260cbb59ba5"
+  integrity sha512-Qbx+4woY24Ixb74zizaKAJur/gpFDwdZAZbZtXIc5yNhyaD13XLyqwLm5LTI1CKw7Vc7xoENUaWLqNQYtr6v2g==
   dependencies:
     tslib "^1.9.0"
 
@@ -4907,6 +4914,16 @@ copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
+
+cordova-plugin-file@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-6.0.2.tgz#f3911479f8357e9aacb5576674f8d95b31a1fb20"
+  integrity sha512-m7cughw327CjONN/qjzsTpSesLaeybksQh420/gRuSXJX5Zt9NfgsSbqqKDon6jnQ9Mm7h7imgyO2uJ34XMBtA==
+
+cordova-plugin-media@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-media/-/cordova-plugin-media-5.0.3.tgz#366188bd4f8472651c1e8304be649af6333b0e36"
+  integrity sha512-UQPFlpk1zL4BY44zGi8RVmYCvcKBCN4Dyf8ovxqGYCC8zR1yhbTRWYDdO9vJdERwbfgWV7+z7FMWiSUfqWm9bQ==
 
 core-js-compat@^3.6.2:
   version "3.6.4"

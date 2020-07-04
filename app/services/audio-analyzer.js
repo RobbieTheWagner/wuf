@@ -131,19 +131,16 @@ export default class AudioAnalyzerService extends Service {
     const deviceInfo = await Device.getInfo();
 
     if (deviceInfo.operatingSystem === 'ios') {
-      let audioCtx = new window.webkitAudioContext();
+      const audioCtx = new window.webkitAudioContext();
 
       audioCtx.decodeAudioData(data, (buffer) => {
         this.analyseAudio(buffer);
       });
     } else {
-      const fileReader = new FileReader();
-      fileReader.onload = async ev => {
-        this.audioContext = new AudioContext();
-        const buffer = await this.audioContext.decodeAudioData(ev.target.result);
-        this.analyseAudio(buffer);
-      };
-      return fileReader.readAsArrayBuffer(data.blob);
+      const audioContext = new AudioContext();
+      const arrayBuffer = await data.arrayBuffer();
+      const buffer = await audioContext.decodeAudioData(arrayBuffer);
+      this.analyseAudio(buffer);
     }
   }
 }
