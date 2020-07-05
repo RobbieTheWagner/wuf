@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { Plugins, FilesystemEncoding } from '@capacitor/core';
+import { Plugins } from '@capacitor/core';
 const { VoiceRecorder, Device, Filesystem } = Plugins;
 import { File } from '@ionic-native/file';
 import { Media } from '@ionic-native/media';
@@ -30,7 +30,7 @@ export default class AudioCapturerComponent extends Component {
       this.mediaRecorder = new MediaRecorder(stream, options);
 
       this.mediaRecorder.addEventListener('dataavailable', e => {
-        this.args.uploadAudioVideo(e.data);
+        this.args.uploadAudioVideo({ blob: e.data });
       });
 
       this.mediaRecorder.start();

@@ -142,7 +142,7 @@ export default class AudioAnalyzerService extends Service {
       return fileReader.readAsArrayBuffer(data);
     } else {
       const audioContext = new AudioContext();
-      const arrayBuffer = await data.arrayBuffer();
+      const arrayBuffer = await data.blob.arrayBuffer();
       const buffer = await audioContext.decodeAudioData(arrayBuffer);
       this.analyseAudio(buffer);
     }
