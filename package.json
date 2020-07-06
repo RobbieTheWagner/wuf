@@ -75,10 +75,6 @@
     "@capacitor/android": "2.2.0",
     "@capacitor/ios": "2.2.0",
     "@ionic-native/core": "^5.27.0",
-    "@ionic-native/file": "^5.27.0",
-    "@ionic-native/media": "^5.27.0",
-    "capacitor-voice-recorder": "^0.0.91",
-    "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-media": "^5.0.3"
+    "capacitor-voice-recorder": "^0.0.91"
   }
 }

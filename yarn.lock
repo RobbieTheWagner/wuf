@@ -1808,20 +1808,6 @@
   dependencies:
     "@types/cordova" latest
 
-"@ionic-native/file@^5.27.0":
-  version "5.27.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/file/-/file-5.27.0.tgz#c2ce00de761dba10bc8c8b75938af01a64489488"
-  integrity sha512-ukgXVUXLQS9T3+P+iTxhzF5s5iJPHnnPiPja5TJLDWX8eAc7eUuqEoKAISIU/VjgGz/2ACOGhvhNn7sqpVX5Rg==
-  dependencies:
-    "@types/cordova" latest
-
-"@ionic-native/media@^5.27.0":
-  version "5.27.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/media/-/media-5.27.0.tgz#0da08b313c67af726b757edee124b6d5db209fc4"
-  integrity sha512-RYBam8zV9oNYNnm56kJDV6lBEy1xVNZz4KpZJ6qntxq3v1X8uqgKBWPgXRuYXqzar75OX4t6lz+ybfI4TCcNMQ==
-  dependencies:
-    "@types/cordova" latest
-
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.3.tgz#3a582bdb53804c6ba6d146579c46e52130cf4a3b"
@@ -4914,16 +4900,6 @@ copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
-
-cordova-plugin-file@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-6.0.2.tgz#f3911479f8357e9aacb5576674f8d95b31a1fb20"
-  integrity sha512-m7cughw327CjONN/qjzsTpSesLaeybksQh420/gRuSXJX5Zt9NfgsSbqqKDon6jnQ9Mm7h7imgyO2uJ34XMBtA==
-
-cordova-plugin-media@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-media/-/cordova-plugin-media-5.0.3.tgz#366188bd4f8472651c1e8304be649af6333b0e36"
-  integrity sha512-UQPFlpk1zL4BY44zGi8RVmYCvcKBCN4Dyf8ovxqGYCC8zR1yhbTRWYDdO9vJdERwbfgWV7+z7FMWiSUfqWm9bQ==
 
 core-js-compat@^3.6.2:
   version "3.6.4"

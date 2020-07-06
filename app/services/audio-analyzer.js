@@ -7,14 +7,13 @@ import {
   determineBarkType,
   getTimeDomainMaxMin
 } from 'wuf/utils/barks';
-import { Plugins } from '@capacitor/core';
-const { Device } = Plugins;
 
 const barkDescriptions = {
   alert:
     'Your dog may be alerting you to a potential problem or intruder nearby.',
   distress: 'Your dog may be in pain or scared.',
   greeting: 'Your dog is saying hello!',
+  inconclusive: 'Either there were no barks in your audio sample or the results were inconclusive.',
   playful: 'Your dog wants to play!'
 };
 
@@ -66,7 +65,6 @@ export default class AudioAnalyzerService extends Service {
 
       this.barksOccurred.push(barkOccurred);
       this.pitches.push(pitch);
-
       this.drawTimeDomain();
     };
 
@@ -125,26 +123,16 @@ export default class AudioAnalyzerService extends Service {
    * @param {*} file
    */
   @action
-  async uploadAudioVideo(data) {
+  async uploadAudioVideo(file) {
     this.clearBarkData();
     this.clearCanvas();
-    const deviceInfo = await Device.getInfo();
-
-    if (deviceInfo.operatingSystem === 'ios') {
-      const fileReader = new FileReader();
-      fileReader.onload = async ev => {
-        const audioContext = new window.webkitAudioContext();
-
-        audioContext.decodeAudioData(ev.target.result, (buffer) => {
-          this.analyseAudio(buffer);
-        });
-      };
-      return fileReader.readAsArrayBuffer(data);
-    } else {
-      const audioContext = new AudioContext();
-      const arrayBuffer = await data.blob.arrayBuffer();
-      const buffer = await audioContext.decodeAudioData(arrayBuffer);
-      this.analyseAudio(buffer);
-    }
+    const fileReader = new FileReader();
+    fileReader.onload = async ev => {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+      await this.audioContext.decodeAudioData(ev.target.result, (buffer) => {
+        this.analyseAudio(buffer);
+      });
+    };
+    return fileReader.readAsArrayBuffer(file.blob);
   }
 }

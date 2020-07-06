@@ -1,9 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { Plugins } from '@capacitor/core';
-const { VoiceRecorder, Device, Filesystem } = Plugins;
-import { File } from '@ionic-native/file';
-import { Media } from '@ionic-native/media';
+const { VoiceRecorder, Device } = Plugins;
 
 export default class AudioCapturerComponent extends Component {
   @action
@@ -15,10 +13,7 @@ export default class AudioCapturerComponent extends Component {
       if (canRecord) {
         const permissionGranted = await VoiceRecorder.requestAudioRecordingPermission();
         if (permissionGranted) {
-          const fileName = `${Date.now()}_wuf_audio_recording.m4a`;
-          await File.createFile(File.tempDirectory, fileName, true);
-          this.file = Media.create(File.tempDirectory.replace(/^file:\/\//, '') + fileName);
-          this.file.startRecord();
+          await VoiceRecorder.startRecording();
         }
       }
     } else {
@@ -42,15 +37,24 @@ export default class AudioCapturerComponent extends Component {
     const deviceInfo = await Device.getInfo();
 
     if (deviceInfo.operatingSystem === 'ios') {
-      this.file.stopRecord();
+      const { value } = await VoiceRecorder.stopRecording();
+      const { recordDataBase64 } = value;
+      // const audioRef = new Audio(`data:audio/aac;base64,${recordDataBase64}`)
+      let raw = window.atob(recordDataBase64);
+      let rawLength = raw.length;
+      let binary = new Uint8Array(new ArrayBuffer(rawLength));
 
-      const { data } = await Filesystem.readFile({
-        path: `file://${this.file._objectInstance.src}`,
+      for (let i = 0; i < rawLength; i++) {
+        binary[i] = raw.charCodeAt(i);
+      }
+
+      let blob = new Blob([binary], {
+        type: 'audio/aac'
       });
-      const buffer = Uint8Array.from(window.atob(data), c => c.charCodeAt(0)).buffer;
-      const blob = new Blob([buffer], { type : 'audio/m4a' });
+      // const buffer = Uint8Array.from(window.atob(data), c => c.charCodeAt(0)).buffer;
+      // const blob = new Blob([buffer], { type : 'audio/webm' });
 
-      this.args.uploadAudioVideo(blob);
+      await this.args.uploadAudioVideo({ blob });
     } else {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();

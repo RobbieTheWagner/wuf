@@ -94,6 +94,8 @@ export function determineBarkType(barksOccuredData, pitchData) {
 
     return 'playful';
   }
+
+  return 'inconclusive';
 }
 
 /**
