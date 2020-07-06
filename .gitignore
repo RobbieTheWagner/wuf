@@ -23,3 +23,9 @@
 /.node_modules.ember-try/
 /bower.json.ember-try
 /package.json.ember-try
+
+# capacitor build files
+/ios/
+/android/
+/electron/
+/.gradle*

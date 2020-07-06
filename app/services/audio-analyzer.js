@@ -13,6 +13,7 @@ const barkDescriptions = {
     'Your dog may be alerting you to a potential problem or intruder nearby.',
   distress: 'Your dog may be in pain or scared.',
   greeting: 'Your dog is saying hello!',
+  inconclusive: 'Either there were no barks in your audio sample or the results were inconclusive.',
   playful: 'Your dog wants to play!'
 };
 
@@ -33,7 +34,7 @@ export default class AudioAnalyzerService extends Service {
   @action
   async analyseAudio(buffer) {
     // 44100 hz is the sample rate equivalent to CD audio
-    const offline = new OfflineAudioContext(2, buffer.length, 44100);
+    const offline = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
     bufferSource.onended = () => {
       this.barkType = determineBarkType(this.barksOccurred, this.pitches);
@@ -51,7 +52,7 @@ export default class AudioAnalyzerService extends Service {
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
     // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
-    
+
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
@@ -64,7 +65,6 @@ export default class AudioAnalyzerService extends Service {
 
       this.barksOccurred.push(barkOccurred);
       this.pitches.push(pitch);
-
       this.drawTimeDomain();
     };
 
@@ -128,9 +128,10 @@ export default class AudioAnalyzerService extends Service {
     this.clearCanvas();
     const fileReader = new FileReader();
     fileReader.onload = async ev => {
-      this.audioContext = new AudioContext();
-      const buffer = await this.audioContext.decodeAudioData(ev.target.result);
-      this.analyseAudio(buffer);
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+      await this.audioContext.decodeAudioData(ev.target.result, (buffer) => {
+        this.analyseAudio(buffer);
+      });
     };
     return fileReader.readAsArrayBuffer(file.blob);
   }
