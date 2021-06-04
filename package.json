@@ -24,6 +24,10 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.14.4",
+    "@capacitor/android": "^3.0.0",
+    "@capacitor/cli": "^3.0.0",
+    "@capacitor/core": "^3.0.0",
+    "@capacitor/ios": "^3.0.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
     "@glimmer/component": "^1.0.4",
@@ -35,6 +39,7 @@
     "ember-cli": "~3.26.1",
     "ember-cli-app-version": "^5.0.0",
     "ember-cli-babel": "^7.26.3",
+    "ember-cli-capacitor": "^0.1.1",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-fastboot": "^2.2.3",
     "ember-cli-htmlbars": "^5.7.1",
