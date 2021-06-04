@@ -24,6 +24,7 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'require-yield': 'off',
   },
+  rules: {},
   overrides: [
     // node files
     {
