@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(/* environment, appConfig */) {
+module.exports = function (/* environment, appConfig */) {
   // See https://zonkyio.github.io/ember-web-app for a list of
   // supported properties
 
@@ -20,16 +20,16 @@ module.exports = function(/* environment, appConfig */) {
       {
         src: '/icons/apple-icon-180x180.png',
         sizes: '180x180',
-        targets: ['apple']
+        targets: ['apple'],
       },
       {
         src: '/icons/favicon-32x32.png',
         sizes: '32x32',
-        targets: ['favicon']
-      }
+        targets: ['favicon'],
+      },
     ],
     ms: {
-      tileColor: '#fff'
-    }
+      tileColor: '#fff',
+    },
   };
 };

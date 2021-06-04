@@ -29,7 +29,7 @@ module.exports = function (environment) {
     siteName: 'Wüf',
     title: 'Wüf',
     twitterUsername: '@shipshapecode',
-    url: 'https://wuf.plus/'
+    url: 'https://wuf.plus/',
   };
 
   if (environment === 'development') {

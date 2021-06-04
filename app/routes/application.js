@@ -7,7 +7,7 @@ export default class ApplicationRoute extends Route {
 
   constructor() {
     super(...arguments);
-    
+
     this.router.on('routeDidChange', () => {
       this.audioAnalyzer.clearBarkData();
     });
@@ -18,7 +18,7 @@ export default class ApplicationRoute extends Route {
 
     this.metaInfo = {
       content: 'Talk to your dog with Ember!',
-      title: 'Wüf'
+      title: 'Wüf',
     };
   }
 }

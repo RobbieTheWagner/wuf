@@ -6,12 +6,12 @@ export default class AudioCapturerComponent extends Component {
   async startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-      video: false
+      video: false,
     });
     const options = { mimeType: 'audio/webm' };
     this.mediaRecorder = new MediaRecorder(stream, options);
 
-    this.mediaRecorder.addEventListener('dataavailable', e => {
+    this.mediaRecorder.addEventListener('dataavailable', (e) => {
       this.args.uploadAudioVideo({ blob: e.data });
     });
 

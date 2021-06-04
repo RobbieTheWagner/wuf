@@ -5,7 +5,7 @@ import {
   determineBarkOccurred,
   determineBarkPitch,
   determineBarkType,
-  getTimeDomainMaxMin
+  getTimeDomainMaxMin,
 } from 'wuf/utils/barks';
 
 const barkDescriptions = {
@@ -13,7 +13,7 @@ const barkDescriptions = {
     'Your dog may be alerting you to a potential problem or intruder nearby.',
   distress: 'Your dog may be in pain or scared.',
   greeting: 'Your dog is saying hello!',
-  playful: 'Your dog wants to play!'
+  playful: 'Your dog wants to play!',
 };
 
 export default class AudioAnalyzerService extends Service {
@@ -51,7 +51,7 @@ export default class AudioAnalyzerService extends Service {
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
     // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
-    
+
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray);
       analyser.getByteFrequencyData(this.frequencyArray);
@@ -76,7 +76,7 @@ export default class AudioAnalyzerService extends Service {
    * Resets the barkType, barksOccurred, and pitches for a fresh run
    */
   @action
-  clearBarkData(){
+  clearBarkData() {
     this.barkType = null;
     this.barksOccurred = [];
     this.column = 0;
@@ -127,7 +127,7 @@ export default class AudioAnalyzerService extends Service {
     this.clearBarkData();
     this.clearCanvas();
     const fileReader = new FileReader();
-    fileReader.onload = async ev => {
+    fileReader.onload = async (ev) => {
       this.audioContext = new AudioContext();
       const buffer = await this.audioContext.decodeAudioData(ev.target.result);
       this.analyseAudio(buffer);

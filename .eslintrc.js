@@ -17,13 +17,13 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   env: {
-    browser: true
+    browser: true,
   },
   rules: {
     'ember/no-jquery': 'error',
-    'require-yield': 'off'
+    'no-prototype-builtins': 'off',
+    'require-yield': 'off',
   },
-  rules: {},
   overrides: [
     // node files
     {
