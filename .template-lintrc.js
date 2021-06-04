@@ -3,6 +3,6 @@
 module.exports = {
   extends: 'octane',
   rules: {
-    'link-href-attributes': false
-  }
+    'link-href-attributes': false,
+  },
 };
