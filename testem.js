@@ -17,6 +17,8 @@ module.exports = {
         '--mute-audio',
         '--remote-debugging-port=0',
         '--window-size=1440,900',
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
       ].filter(Boolean),
     },
   },
