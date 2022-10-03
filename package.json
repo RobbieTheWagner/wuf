@@ -23,7 +23,7 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-object-rest-spread": "^7.14.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
     "@capacitor/android": "^3.0.0",
     "@capacitor/cli": "^3.0.0",
     "@capacitor/core": "^3.0.0",
