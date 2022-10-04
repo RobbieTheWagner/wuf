@@ -8,12 +8,22 @@
           Finally understand what your dog is saying.
         </h1>
 
-        <div class="flex flex-wrap mt-10 justify-center w-full lg:justify-start">
-          <LinkTo class="btn mb-4 lg:mr-4 lg:w-40" @route="upload">
+        <div
+          class="flex flex-wrap mt-10 justify-center w-full lg:justify-start"
+        >
+          <LinkTo
+            class="btn mb-4 lg:mr-4 lg:w-40"
+            @route="upload"
+            data-test-upload-link-to
+          >
             Upload
           </LinkTo>
 
-          <LinkTo class="btn mb-4 lg:w-40" @route="microphone" data-test-record-link-to>
+          <LinkTo
+            class="btn mb-4 lg:w-40"
+            @route="microphone"
+            data-test-record-link-to
+          >
             Record
           </LinkTo>
         </div>

@@ -1,4 +1,6 @@
-<div class="bg-gray-100 border border-dashed flex h-32 items-center p-4 rounded">
+<div
+  class="bg-gray-100 border border-dashed flex h-32 items-center p-4 rounded"
+>
   <FileDropzone
     class="flex flex-col justify-center h-full w-full"
     @name="audio" as |dropzone|
@@ -27,6 +29,7 @@
             class="cursor-pointer text-btn underline"
             id="upload-audio"
             tabindex="0"
+            data-test-audio-upload-link
           >
             Add audio/video.
           </a>

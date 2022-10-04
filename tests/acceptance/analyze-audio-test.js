@@ -3,23 +3,24 @@ import { visit, currentURL, click, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { getOwner } from '@ember/application';
 import { later } from '@ember/runloop';
+import { selectFiles } from 'ember-file-upload/test-support';
 
-module('Acceptance | record audio', function (hooks) {
+module('Acceptance | analyze audio', function (hooks) {
   setupApplicationTest(hooks);
 
   hooks.beforeEach(async function () {
     this.audioAnalyzer = getOwner(this).lookup(`service:audio-analyzer`);
 
-    var BASE64_MARKER = ';base64,';
+    const BASE64_MARKER = ';base64,';
 
     function convertDataURIToBinary(dataURI) {
-      var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
-      var base64 = dataURI.substring(base64Index);
-      var raw = window.atob(base64);
-      var rawLength = raw.length;
-      var array = new Uint8Array(new ArrayBuffer(rawLength));
+      const base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+      const base64 = dataURI.substring(base64Index);
+      const raw = window.atob(base64);
+      const rawLength = raw.length;
+      const array = new Uint8Array(new ArrayBuffer(rawLength));
 
-      for (var i = 0; i < rawLength; i++) {
+      for (let i = 0; i < rawLength; i++) {
         array[i] = raw.charCodeAt(i);
       }
       return array;
@@ -31,6 +32,7 @@ module('Acceptance | record audio', function (hooks) {
     const binary = convertDataURIToBinary(data);
 
     this.blob = new Blob([binary], { type: 'audio/webm' });
+    this.file = new File([binary], 'test.webm', { type: 'audio/webm' });
 
     const uploadAudioVideo = async () => {
       this.audioAnalyzer.clearBarkData();
@@ -43,13 +45,14 @@ module('Acceptance | record audio', function (hooks) {
         );
         this.audioAnalyzer.analyseAudio(buffer);
       };
+
       return fileReader.readAsArrayBuffer(this.blob);
     };
 
     this.audioAnalyzer.uploadAudioVideo = uploadAudioVideo;
   });
 
-  test('record an audio clip', async function (assert) {
+  test('record an audio clip and it is analyzed', async function (assert) {
     await visit('/');
 
     assert.equal(currentURL(), '/');
@@ -67,6 +70,26 @@ module('Acceptance | record audio', function (hooks) {
     later(async () => {
       await click('[data-test-stop-recording-button]');
     }, 200);
+
+    await waitFor('[data-test-bark-type]');
+
+    await assert.dom('[data-test-bark-type]').includesText('Alert');
+  });
+
+  test('upload an audio clip and it is analyzed', async function (assert) {
+    await visit('/');
+
+    assert.equal(currentURL(), '/');
+
+    await click('[data-test-upload-link-to]');
+
+    assert.equal(currentURL(), '/upload');
+
+    assert
+      .dom('[data-test-no-bark-type]')
+      .includesText('No data uploaded yet.');
+
+    await selectFiles('.file-upload input', this.file);
 
     await waitFor('[data-test-bark-type]');
 
