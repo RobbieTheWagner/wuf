@@ -1,7 +1,10 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 
 export default class AudioCapturerComponent extends Component {
+  @service audioAnalyzer;
+
   @action
   async startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -12,7 +15,9 @@ export default class AudioCapturerComponent extends Component {
     this.mediaRecorder = new MediaRecorder(stream, options);
 
     this.mediaRecorder.addEventListener('dataavailable', (e) => {
-      this.args.uploadAudioVideo({ blob: e.data });
+      this.audioAnalyzer.uploadAudioVideo({
+        blob: e.data,
+      });
     });
 
     this.mediaRecorder.start();
