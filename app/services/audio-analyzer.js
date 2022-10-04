@@ -122,7 +122,6 @@ export default class AudioAnalyzerService extends Service {
    * Upload audio/video files and trigger analyseAudio
    * @param {*} file
    */
-  @action
   async uploadAudioVideo(file) {
     this.clearBarkData();
     this.clearCanvas();

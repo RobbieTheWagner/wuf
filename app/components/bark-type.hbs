@@ -10,7 +10,7 @@
           {{svg-jar @barkType height="200" width="200"}}
         </div>
         <div class="flex-grow">
-          <h2 class="font-bold text-3xl">
+          <h2 class="font-bold text-3xl" data-test-bark-type>
             {{capitalize @barkType}}
           </h2>
 
@@ -26,7 +26,7 @@
             We can't wait to dig into your dog's barking data!
           </h4>
 
-          <p class="italic mt-1 text-sm">
+          <p class="italic mt-1 text-sm" data-test-no-bark-type>
             No data uploaded yet.
           </p>
         </div>

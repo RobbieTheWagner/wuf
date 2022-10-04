@@ -23,7 +23,7 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-object-rest-spread": "^7.14.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
     "@capacitor/android": "^3.0.0",
     "@capacitor/cli": "^3.0.0",
     "@capacitor/core": "^3.0.0",
@@ -34,11 +34,11 @@
     "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
-    "ember-animated": "^0.11.0",
-    "ember-auto-import": "^1.11.2",
+    "ember-animated": "^1.0.4",
+    "ember-auto-import": "^2.4.2",
     "ember-cli": "~3.26.1",
     "ember-cli-app-version": "^5.0.0",
-    "ember-cli-babel": "^7.26.3",
+    "ember-cli-babel": "^7.26.11",
     "ember-cli-capacitor": "^0.1.1",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-fastboot": "^2.2.3",
@@ -52,7 +52,7 @@
     "ember-file-upload": "^3.0.6",
     "ember-load-initializers": "^2.1.2",
     "ember-maybe-import-regenerator": "^0.1.6",
-    "ember-meta": "^1.0.0",
+    "ember-meta": "^2.0.0",
     "ember-page-title": "^6.2.1",
     "ember-qunit": "^5.1.4",
     "ember-resolver": "^8.0.2",
@@ -77,7 +77,8 @@
     "prettier": "^2.2.1",
     "qunit": "^2.14.1",
     "qunit-dom": "^1.6.0",
-    "tailwindcss": "^1.9.6"
+    "tailwindcss": "^1.9.6",
+    "webpack": "^5.74.0"
   },
   "engines": {
     "node": ">= 14"
