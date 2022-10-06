@@ -9,6 +9,8 @@ import convertDataURIToBinary from 'wuf/tests/helpers/convert-data-uri-to-binary
 import base64Audio from 'wuf/tests/fixtures/sample-audio-data';
 import { waitUntil } from '@ember/test-helpers';
 import processDogRangeFrequency from 'wuf/tests/helpers/process-dog-range-frequency';
+import barksOccurred from 'wuf/tests/fixtures/barks-occurred';
+import pitches from 'wuf/tests/fixtures/pitches';
 
 module('Unit | Utility | barks', function () {
   test('determineBarkOccurred', function (assert) {
@@ -31,88 +33,6 @@ module('Unit | Utility | barks', function () {
   });
 
   test('determineBarkType', function (assert) {
-    const barksOccurred = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-      true,
-      false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      false,
-      true,
-      true,
-      false,
-      true,
-    ];
-
-    const pitches = [
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'mid',
-      'mid',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-      'low',
-    ];
-
     let result = determineBarkType(barksOccurred, pitches);
 
     assert.equal(result, 'alert');
