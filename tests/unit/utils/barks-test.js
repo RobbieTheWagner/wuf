@@ -25,8 +25,6 @@ module('Unit | Utility | barks', function () {
 
     await waitUntil(() => this.dogRangeFrequencyArray);
 
-    debugger;
-
     let result = determineBarkPitch(this.dogRangeFrequencyArray);
 
     assert.equal(result, 'low');
