@@ -4,7 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import { later } from '@ember/runloop';
 import { selectFiles } from 'ember-file-upload/test-support';
 import MockedAudioAnalyzerService from 'wuf/tests/helpers/mocked-audio-analyzer-service';
-import convertDataURIToBinary from 'wuf/tests/helpers/convert-data-uri-to-binary';
+import convertDataURIToBinary from 'wuf/utils/convert-data-uri-to-binary';
 import base64Audio from 'wuf/tests/fixtures/sample-audio-data';
 
 module('Acceptance | analyze audio', function (hooks) {

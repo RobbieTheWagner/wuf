@@ -5,7 +5,7 @@ import {
   getTimeDomainMaxMin,
 } from 'wuf/utils/barks';
 import { module, test } from 'qunit';
-import convertDataURIToBinary from 'wuf/tests/helpers/convert-data-uri-to-binary';
+import convertDataURIToBinary from 'wuf/utils/convert-data-uri-to-binary';
 import base64Audio from 'wuf/tests/fixtures/sample-audio-data';
 import { waitUntil } from '@ember/test-helpers';
 import processDogRangeFrequency from 'wuf/tests/helpers/process-dog-range-frequency';
