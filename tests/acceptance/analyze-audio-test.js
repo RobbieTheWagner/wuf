@@ -61,7 +61,7 @@ module('Acceptance | analyze audio', function (hooks) {
       .dom('[data-test-no-bark-type]')
       .includesText('No data uploaded yet.');
 
-    await selectFiles('.file-upload input', file);
+    await selectFiles('#upload-audio', file);
 
     await waitFor('[data-test-bark-type]');
 
