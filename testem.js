@@ -11,14 +11,14 @@ module.exports = {
       ci: [
         // --no-sandbox is needed when running Chrome inside a container
         process.env.CI ? '--no-sandbox' : null,
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
         '--headless',
         '--disable-dev-shm-usage',
         '--disable-software-rasterizer',
         '--mute-audio',
         '--remote-debugging-port=0',
         '--window-size=1440,900',
-        '--use-fake-device-for-media-stream',
-        '--use-fake-ui-for-media-stream',
       ].filter(Boolean),
     },
   },
