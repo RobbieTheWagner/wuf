@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { on } from '@ember/modifier';
@@ -8,6 +9,8 @@ import StopCircle from 'wuf/svgs/stop-circle.svg';
 
 export default class AudioCapturer extends Component {
   @service declare audioAnalyzer: AudioAnalyzerService;
+
+  @tracked isRecording = false;
 
   mediaRecorder?: MediaRecorder;
 
@@ -26,17 +29,20 @@ export default class AudioCapturer extends Component {
     });
 
     this.mediaRecorder.start();
+    this.isRecording = true;
   }
 
   @action
   stopRecording() {
     this.mediaRecorder?.stop();
+    this.isRecording = false;
   }
 
   <template>
     <button
-      class="btn mb-4"
+      class="btn mb-4 disabled:cursor-not-allowed disabled:opacity-50"
       type="button"
+      disabled={{this.isRecording}}
       {{on "click" this.startRecording}}
       data-test-start-recording-button
     >
@@ -45,8 +51,9 @@ export default class AudioCapturer extends Component {
     </button>
 
     <button
-      class="btn mb-4"
+      class="btn mb-4 disabled:cursor-not-allowed disabled:opacity-50"
       type="button"
+      disabled={{unless this.isRecording true}}
       {{on "click" this.stopRecording}}
       data-test-stop-recording-button
     >

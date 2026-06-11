@@ -1,5 +1,12 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, click, waitFor } from '@ember/test-helpers';
+import {
+  visit,
+  currentURL,
+  click,
+  find,
+  waitFor,
+  waitUntil,
+} from '@ember/test-helpers';
 import { setupApplicationTest } from 'wuf/tests/helpers';
 import { selectFiles } from 'ember-file-upload/test-support';
 import MockedAudioAnalyzerService from 'wuf/tests/helpers/mocked-audio-analyzer-service';
@@ -41,9 +48,15 @@ module('Acceptance | analyze audio', function (hooks) {
 
     await click('[data-test-start-recording-button]');
 
-    setTimeout(() => {
-      void click('[data-test-stop-recording-button]');
-    }, 200);
+    // getUserMedia + MediaRecorder setup is async, so wait until recording
+    // has actually started before stopping it
+    await waitUntil(
+      () =>
+        !find('[data-test-stop-recording-button]')?.hasAttribute('disabled'),
+      { timeout: 10000 },
+    );
+
+    await click('[data-test-stop-recording-button]');
 
     await waitFor('[data-test-bark-type]', { timeout: 10000 });
 
