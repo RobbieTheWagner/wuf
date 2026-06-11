@@ -9,7 +9,7 @@ export default defineConfig({
     classicEmberSupport(),
     ember(),
     tailwindcss(),
-    svgJar({ target: 'ember' }),
+    svgJar({ target: 'ember', defaultSprite: 'icons' }),
     babel({
       babelHelpers: 'runtime',
       extensions,
