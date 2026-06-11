@@ -1,0 +1,9 @@
+# unconventional files
+/blueprints/*/files/
+
+# compiled output
+/dist/
+
+# native projects (Capacitor)
+/android/
+/ios/
