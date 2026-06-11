@@ -2,6 +2,12 @@
   command = "pnpm build"
   publish = "dist"
 
+# Vite already minifies and fingerprints assets. Netlify's image
+# "optimization" runs SVGO over the svg sprite and strips all of the
+# <symbol> elements, breaking every icon.
+[build.processing]
+  skip_processing = true
+
 [build.environment]
   NODE_VERSION = "22"
 
