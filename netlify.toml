@@ -2,11 +2,10 @@
   command = "pnpm build"
   publish = "dist"
 
-# Vite already minifies and fingerprints assets. Netlify's image
-# "optimization" runs SVGO over the svg sprite and strips all of the
-# <symbol> elements, breaking every icon.
-[build.processing]
-  skip_processing = true
+# NOTE: don't install image-optimization build plugins (e.g.
+# netlify-plugin-image-optim) on this site — SVGO strips the <symbol>
+# elements from the svg sprite, breaking every icon. Vite already
+# minifies and fingerprints all assets.
 
 [build.environment]
   NODE_VERSION = "22"
