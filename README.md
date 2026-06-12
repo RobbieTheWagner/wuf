@@ -1,57 +1,78 @@
-# wuf
+# Wüf
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+Talk to your dog with Ember! Wüf analyzes dog barks — either recorded live
+from the microphone or uploaded as audio/video files — using the Web Audio
+API, and tells you whether your dog's bark was an alert, distress, greeting,
+or playful bark.
+
+The web app is wrapped with [Capacitor](https://capacitorjs.com/), so it can
+also be built for iOS and Android.
 
 ## Prerequisites
 
-You will need the following things properly installed on your computer.
-
-* [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
-* [Ember CLI](https://ember-cli.com/)
-* [Google Chrome](https://google.com/chrome/)
+- [Node.js](https://nodejs.org/) (v22+, see `.tool-versions`)
+- [pnpm](https://pnpm.io/)
+- [Xcode](https://developer.apple.com/xcode/) (for iOS builds)
+- [Android Studio](https://developer.android.com/studio) (for Android builds)
 
 ## Installation
 
-* `git clone <repository-url>` this repository
-* `cd wuf`
-* `npm install`
+```sh
+git clone https://github.com/shipshapecode/wuf.git
+cd wuf
+pnpm install
+```
 
 ## Running / Development
 
-* `ember serve`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-* Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+```sh
+pnpm start
+```
 
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
+Visit the app at [http://localhost:4200](http://localhost:4200).
 
 ### Running Tests
 
-* `ember test`
-* `ember test --server`
+```sh
+pnpm test
+```
 
 ### Linting
 
-* `npm run lint:hbs`
-* `npm run lint:js`
-* `npm run lint:js -- --fix`
+```sh
+pnpm lint
+pnpm lint:fix
+```
 
 ### Building
 
-* `ember build` (development)
-* `ember build --environment production` (production)
+```sh
+pnpm build
+```
 
-### Deploying
+The production build is output to `dist/`.
 
-Specify what it takes to deploy your app.
+## Mobile (Capacitor)
 
-## Further Reading / Useful Links
+Build the web app and sync it into the native projects:
 
-* [ember.js](https://emberjs.com/)
-* [ember-cli](https://ember-cli.com/)
-* Development Browser Extensions
-  * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
-  * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
+```sh
+pnpm cap:sync
+```
+
+Then open the native IDE of your choice:
+
+```sh
+pnpm cap:ios     # build, sync, and open Xcode
+pnpm cap:android # build, sync, and open Android Studio
+```
+
+To use live reload during native development, run `pnpm start` and point the
+Capacitor dev server at it by adding the following to `capacitor.config.json`
+(don't commit it):
+
+```json
+"server": {
+  "url": "http://localhost:4200"
+}
+```

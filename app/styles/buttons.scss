@@ -1,8 +1,0 @@
-.btn {
-  @apply bg-btn flex font-semibold items-center justify-center pb-4 pl-8 pr-8 pt-4 rounded-full text-center text-white uppercase w-full;
-  transition: all 0.25s;
-}
-
-.btn:hover {
-  @apply bg-btn-hover text-main;
-}

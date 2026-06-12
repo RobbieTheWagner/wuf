@@ -1,0 +1,17 @@
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+# NOTE: don't install image-optimization build plugins (e.g.
+# netlify-plugin-image-optim) on this site — SVGO strips the <symbol>
+# elements from the svg sprite, breaking every icon. Vite already
+# minifies and fingerprints all assets.
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Single-page app: serve index.html for all routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,19 +1,16 @@
 'use strict';
 
 module.exports = function (environment) {
-  let ENV = {
+  const ENV = {
     modulePrefix: 'wuf',
     environment,
     rootURL: '/',
-    locationType: 'auto',
+    locationType: 'history',
     EmberENV: {
+      EXTEND_PROTOTYPES: false,
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
-      },
-      EXTEND_PROTOTYPES: {
-        // Prevent Ember Data from overriding Date.parse.
-        Date: false,
       },
     },
 
@@ -21,15 +18,6 @@ module.exports = function (environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-  };
-
-  ENV['ember-meta'] = {
-    description: 'Talk to your dog with Ember!',
-    imgSrc: 'http://i.imgur.com/KVqNjgO.png',
-    siteName: 'Wüf',
-    title: 'Wüf',
-    twitterUsername: '@shipshapecode',
-    url: 'https://wuf.plus/',
   };
 
   if (environment === 'development') {

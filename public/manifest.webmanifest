@@ -1,0 +1,26 @@
+{
+  "name": "Wüf",
+  "short_name": "Wüf",
+  "description": "Talk to your dog with Ember!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#D3FAEC",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icons/android-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/apple-icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/android-icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ]
+}
