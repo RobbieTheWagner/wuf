@@ -21,40 +21,46 @@
   }
 }
 
-body {
-  @apply text-main;
+@layer base {
+  body {
+    @apply text-main;
 
-  font-family: Poppins, sans-serif;
+    font-family: Poppins, sans-serif;
+  }
 }
 
-.btn {
-  @apply bg-btn flex font-semibold items-center justify-center px-8 py-4 rounded-full text-center text-white uppercase w-full;
+/* Keep custom classes in the components layer so single-purpose utilities
+   (e.g. lg:w-40 on a .btn) can still override them, as in Tailwind 3. */
+@layer components {
+  .btn {
+    @apply bg-btn flex font-semibold items-center justify-center px-8 py-4 rounded-full text-center text-white uppercase w-full;
 
-  transition: all 0.25s;
-}
+    transition: all 0.25s;
+  }
 
-.btn:hover {
-  @apply bg-btn-hover text-main;
-}
+  .btn:hover {
+    @apply bg-btn-hover text-main;
+  }
 
-.nav-links {
-  @apply bg-white fixed grow h-screen inset-0 w-full;
-  @apply lg:bg-transparent lg:h-auto lg:items-center lg:px-2 lg:pt-2 lg:static lg:w-auto;
-}
+  .nav-links {
+    @apply bg-white fixed grow h-screen inset-0 w-full;
+    @apply lg:bg-transparent lg:h-auto lg:items-center lg:px-2 lg:pt-2 lg:static lg:w-auto;
+  }
 
-.nav-link {
-  @apply block font-bold p-4 text-base text-main;
-  @apply lg:inline-block lg:mt-0;
+  .nav-link {
+    @apply block font-bold p-4 text-base text-main;
+    @apply lg:inline-block lg:mt-0;
 
-  transition: color 0.25s;
-}
+    transition: color 0.25s;
+  }
 
-.nav-link:active,
-.nav-link:visited {
-  @apply text-main;
-}
+  .nav-link:active,
+  .nav-link:visited {
+    @apply text-main;
+  }
 
-.nav-link.active,
-.nav-link:hover {
-  @apply text-btn;
+  .nav-link.active,
+  .nav-link:hover {
+    @apply text-btn;
+  }
 }
