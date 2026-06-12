@@ -28,9 +28,9 @@ export default class NavMenu extends Component {
         <div class="flex shrink-0 items-center pl-2 pr-2 pt-2">
           <a href="/" class="inline-flex">
             <div class="inline-block">
-              <Wuf class="-mt-2 p-2" height="60" width="60" />
+              <Wuf class="-mt-2 logo-mark p-2" height="60" width="60" />
             </div>
-            <div class="font-black text-heading text-3xl">
+            <div class="font-black text-3xl text-white">
               Wüf
             </div>
           </a>
@@ -39,7 +39,7 @@ export default class NavMenu extends Component {
         <div class="block lg:hidden">
           <button
             aria-label="Open navigation menu"
-            class="flex items-center px-3 py-2 text-xl"
+            class="active:scale-90 flex items-center px-3 py-2 text-xl transition-transform"
             type="button"
             {{on "click" (fn this.toggleNavMenu true)}}
           >
@@ -47,12 +47,12 @@ export default class NavMenu extends Component {
           </button>
         </div>
 
-        <div class="nav-links {{unless this.isOpen 'hidden'}} lg:flex">
+        <div class="nav-links {{if this.isOpen 'is-open'}} lg:flex">
           <div class="lg:flex lg:grow lg:justify-end">
             <div class="flex lg:hidden justify-end m-4">
               <button
                 aria-label="Close navigation menu"
-                class="cursor-pointer"
+                class="active:scale-90 cursor-pointer transition-transform"
                 type="button"
                 {{on "click" (fn this.toggleNavMenu false)}}
               >

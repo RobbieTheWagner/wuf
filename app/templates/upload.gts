@@ -1,59 +1,60 @@
 import Component from '@glimmer/component';
+import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { pageTitle } from 'ember-page-title';
 import type AudioAnalyzerService from 'wuf/services/audio-analyzer';
 import AudioUploader from 'wuf/components/audio-uploader';
-import BarkType from 'wuf/components/bark-type';
-import House from 'wuf/svgs/house.svg';
+import BarkResultSheet from 'wuf/components/bark-result-sheet';
 
 export default class UploadTemplate extends Component {
   @service declare audioAnalyzer: AudioAnalyzerService;
 
+  @action
+  resetAnalysis() {
+    this.audioAnalyzer.clearBarkData();
+    this.audioAnalyzer.clearCanvas();
+  }
+
   <template>
     {{pageTitle "Upload"}}
 
-    <div class="flex flex-wrap justify-center p-8 w-full">
-      <div class="max-w-6xl w-full">
-        <div class="lg:flex h-full items-center w-full">
-          <div class="mb-2 mt-2 w-full lg:mr-8 lg:w-1/2">
-            <h4
-              class="font-semibold p-2 text-alt text-center uppercase lg:text-left"
-            >
-              Want to know
-            </h4>
+    <div
+      class="app-header flex flex-col max-w-md min-h-[calc(100dvh-7rem)] mx-auto px-6"
+    >
+      <header>
+        <p
+          class="font-semibold text-btn-hover text-sm tracking-widest uppercase"
+        >
+          Wüf
+        </p>
+        <h1 class="display mt-1 text-4xl text-white">
+          Upload
+        </h1>
+      </header>
 
-            <h2
-              class="font-bold p-2 text-center text-heading text-3xl lg:text-left"
-            >
-              What your dog said?
-            </h2>
+      <p class="mt-3 text-white/60" data-test-no-bark-type>
+        Got a barking video from the dog cam? Drop it in.
+      </p>
 
-            <div class="flex justify-center">
-              <House class="h-auto max-w-sm w-full" />
-            </div>
+      <div class="mt-6">
+        <AudioUploader />
+      </div>
 
-            <AudioUploader />
-          </div>
-
-          <div class="flex flex-col mb-2 mt-2 w-full lg:mr-8 lg:w-1/2">
-            <BarkType
-              @barkType={{this.audioAnalyzer.barkType}}
-              @barkDescription={{this.audioAnalyzer.barkDescription}}
-            />
-
-            <div class="mb-2 mt-2">
-              <h2 class="font-bold mb-2 text-heading text-2xl">
-                Visualization
-              </h2>
-
-              <canvas
-                class="bg-heading rounded h-40 w-full"
-                id="canvas"
-              ></canvas>
-            </div>
-          </div>
-        </div>
+      <div class="grow min-h-40 mt-6 relative wave-panel">
+        <canvas
+          class="absolute h-full inset-0 rounded-[1.25rem] w-full"
+          id="canvas"
+        ></canvas>
       </div>
     </div>
+
+    <BarkResultSheet
+      @isAnalyzing={{this.audioAnalyzer.isAnalyzing}}
+      @outcome={{this.audioAnalyzer.outcome}}
+      @barkType={{this.audioAnalyzer.barkType}}
+      @barkDescription={{this.audioAnalyzer.barkDescription}}
+      @barkCount={{this.audioAnalyzer.revealedBarkCount}}
+      @onDismiss={{this.resetAnalysis}}
+    />
   </template>
 }

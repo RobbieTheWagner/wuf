@@ -1,14 +1,35 @@
 @import "tailwindcss";
 
+@plugin "tailwindcss-motion";
+
 @source '../';
 
 @theme {
-  --color-alt: #3a506b;
-  --color-btn: #5bc0be;
-  --color-btn-hover: #6fffe9;
-  --color-heading: #0b132b;
-  --color-main: #1c2541;
+  --font-display: "Bricolage Grotesque Variable", "Poppins", sans-serif;
+  --font-sans: "Poppins", sans-serif;
+
+  /* The original hex palette (#0b132b → #6fffe9) translated to OKLCH with a
+     chroma boost — same family, more vibrancy on wide-gamut displays. */
+  --color-heading: oklch(22% 0.07 268deg);
+  --color-main: oklch(28% 0.08 266deg);
+  --color-alt: oklch(46% 0.09 252deg);
+  --color-btn: oklch(75% 0.13 190deg);
+  --color-btn-hover: oklch(91% 0.17 172deg);
+  --color-record: oklch(64% 0.24 27deg);
+  --color-surface: oklch(26% 0.06 266deg);
+  --color-surface-raised: oklch(32% 0.07 264deg);
+
+  /* One accent per verdict, so each bark type has its own personality */
+  --color-bark-alert: oklch(82% 0.16 80deg);
+  --color-bark-distress: oklch(68% 0.21 25deg);
+  --color-bark-greeting: oklch(75% 0.13 190deg);
+  --color-bark-playful: oklch(91% 0.17 172deg);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --animate-fade-in: fade-in 1s ease-in-out;
+  --animate-ripple: ripple 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  --animate-breathe: breathe 2.4s ease-in-out infinite;
+  --animate-eq: eq 1.1s ease-in-out infinite alternate;
+  --animate-float: float 5.5s ease-in-out infinite;
 
   @keyframes fade-in {
     from {
@@ -19,48 +40,533 @@
       opacity: 1;
     }
   }
+
+  @keyframes ripple {
+    from {
+      opacity: 0.55;
+      scale: 1;
+    }
+
+    to {
+      opacity: 0;
+      scale: 2.2;
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      scale: 1;
+    }
+
+    50% {
+      scale: 1.05;
+    }
+  }
+
+  @keyframes eq {
+    from {
+      transform: scaleY(0.15);
+    }
+
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    50% {
+      translate: 0 -0.75rem;
+    }
+  }
+}
+
+/* Keyframes used by plain CSS below (not by animate-* utilities), so they
+   live outside @theme. */
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+
+  25% {
+    rotate: -10deg;
+  }
+
+  60% {
+    rotate: 7deg;
+  }
+}
+
+@keyframes nav-link-in {
+  from {
+    opacity: 0;
+    translate: 1.5rem 0;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 -0.75rem;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 
 @layer base {
   body {
-    @apply text-main;
+    @apply antialiased bg-heading text-white;
 
-    font-family: Poppins, sans-serif;
+    font-family: var(--font-sans);
   }
 }
 
-/* Keep custom classes in the components layer so single-purpose utilities
-   (e.g. lg:w-40 on a .btn) can still override them, as in Tailwind 3. */
-@layer components {
-  .btn {
-    @apply bg-btn flex font-semibold items-center justify-center px-8 py-4 rounded-full text-center text-white uppercase w-full;
+/* Route transitions: chrome holds still while the page content slides.
+   Guarded by reduced-motion; the JS side also feature-detects. */
+@media (prefers-reduced-motion: no-preference) {
+  main {
+    view-transition-name: page;
+  }
 
-    transition: all 0.25s;
+  ::view-transition-old(page) {
+    animation: page-out 0.2s ease both;
+  }
+
+  ::view-transition-new(page) {
+    animation: page-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+
+@layer components {
+  /* ---------- Typography ---------- */
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      100deg,
+      var(--color-btn),
+      var(--color-btn-hover)
+    );
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ---------- Buttons ---------- */
+
+  .btn {
+    @apply font-bold inline-flex gap-2 items-center justify-center px-8 py-4 rounded-full text-heading;
+
+    background: linear-gradient(
+      135deg,
+      var(--color-btn),
+      var(--color-btn-hover)
+    );
+    box-shadow: 0 8px 24px -10px oklch(75% 0.13 190deg / 70%);
+    transition:
+      box-shadow 0.3s ease,
+      filter 0.25s ease,
+      translate 0.3s var(--ease-spring),
+      scale 0.15s ease-out;
   }
 
   .btn:hover {
-    @apply bg-btn-hover text-main;
+    box-shadow: 0 14px 32px -10px oklch(75% 0.13 190deg / 80%);
+    filter: brightness(1.07);
   }
 
+  .btn:active {
+    scale: 0.96;
+  }
+
+  .btn-ghost {
+    @apply border border-white/25 font-bold inline-flex gap-2 items-center justify-center px-8 py-4 rounded-full text-white;
+
+    transition:
+      border-color 0.25s ease,
+      color 0.25s ease,
+      translate 0.3s var(--ease-spring),
+      scale 0.15s ease-out;
+  }
+
+  .btn-ghost:hover {
+    @apply border-btn-hover text-btn-hover;
+  }
+
+  .btn-ghost:active {
+    scale: 0.96;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn:hover,
+    .btn-ghost:hover {
+      translate: 0 -2px;
+    }
+
+    .btn:active,
+    .btn-ghost:active {
+      translate: 0 0;
+    }
+  }
+
+  /* ---------- Marketing nav ---------- */
+
   .nav-links {
-    @apply bg-white fixed grow h-screen inset-0 w-full;
+    @apply fixed grow h-screen inset-0 w-full z-50;
     @apply lg:bg-transparent lg:h-auto lg:items-center lg:px-2 lg:pt-2 lg:static lg:w-auto;
+
+    background: oklch(22% 0.07 268deg / 92%);
+    backdrop-filter: blur(20px);
+  }
+
+  /* Mobile nav: a sprung slide-in panel instead of a display toggle. The
+     panel stays in the DOM; `is-open` drives the transition. */
+  @media (width < 64rem) {
+    .nav-links {
+      opacity: 0;
+      transform: translateX(100%);
+      transition:
+        transform 0.45s var(--ease-spring),
+        opacity 0.3s ease,
+        visibility 0s linear 0.45s;
+      visibility: hidden;
+    }
+
+    .nav-links.is-open {
+      opacity: 1;
+      transform: none;
+      transition:
+        transform 0.45s var(--ease-spring),
+        opacity 0.25s ease;
+      visibility: visible;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .nav-links.is-open .nav-link {
+        animation: nav-link-in 0.45s var(--ease-spring) both;
+      }
+
+      .nav-links.is-open .nav-link:nth-of-type(2) {
+        animation-delay: 60ms;
+      }
+
+      .nav-links.is-open .nav-link:nth-of-type(3) {
+        animation-delay: 120ms;
+      }
+
+      .nav-links.is-open .nav-link:nth-of-type(4) {
+        animation-delay: 180ms;
+      }
+    }
   }
 
   .nav-link {
-    @apply block font-bold p-4 text-base text-main;
+    @apply block font-semibold p-4 relative text-base text-white/70;
     @apply lg:inline-block lg:mt-0;
 
     transition: color 0.25s;
   }
 
+  .nav-link::after {
+    background: linear-gradient(
+      90deg,
+      var(--color-btn),
+      var(--color-btn-hover)
+    );
+    border-radius: 9999px;
+    bottom: 0.625rem;
+    content: "";
+    height: 2px;
+    inset-inline: 1rem;
+    position: absolute;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s var(--ease-spring);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    transform: scaleX(1);
+  }
+
   .nav-link:active,
   .nav-link:visited {
-    @apply text-main;
+    @apply text-white/70;
   }
 
   .nav-link.active,
   .nav-link:hover {
-    @apply text-btn;
+    @apply text-btn-hover;
+  }
+
+  /* Dog logo wiggles when you pet it. */
+  @media (prefers-reduced-motion: no-preference) {
+    a:hover .logo-mark {
+      animation: wiggle 0.6s var(--ease-spring);
+      transform-origin: 50% 80%;
+    }
+  }
+
+  /* ---------- Marketing atmosphere ---------- */
+
+  /* Soft glowing color fields layered behind hero/sections */
+  .glow-orb {
+    border-radius: 9999px;
+    filter: blur(72px);
+    opacity: 0.45;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  /* White "sticker" card that lets the line-art illustrations shine */
+  .panel {
+    @apply bg-white rounded-3xl;
+
+    box-shadow:
+      0 1px 0 oklch(100% 0 0deg / 60%) inset,
+      0 24px 48px -24px oklch(0% 0 0deg / 50%);
+  }
+
+  /* Ambient equalizer bar (compose with animate-eq + arbitrary delays) */
+  .eq-bar {
+    background: linear-gradient(
+      to top,
+      var(--color-btn),
+      var(--color-btn-hover)
+    );
+    border-radius: 9999px;
+    transform-origin: bottom;
+    width: 0.25rem;
+  }
+
+  /* ---------- Native app shell ---------- */
+
+  /* <main> is its own stacking context (view-transition-name), so it needs
+     to sit above the z-40 tab bar for the result sheet/backdrop to cover it */
+  .app-shell main {
+    position: relative;
+    z-index: 50;
+  }
+
+  .app-shell {
+    background:
+      radial-gradient(
+        55rem 38rem at 115% -12%,
+        oklch(45% 0.11 195deg / 28%),
+        transparent 65%
+      ),
+      radial-gradient(
+        45rem 32rem at -25% 115%,
+        oklch(40% 0.12 280deg / 25%),
+        transparent 65%
+      ),
+      var(--color-heading);
+    min-height: 100dvh;
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    padding-top: max(1.25rem, env(safe-area-inset-top));
+  }
+
+  .tab-bar {
+    @apply bottom-0 fixed inset-x-0 z-40;
+
+    backdrop-filter: blur(20px);
+    background: oklch(22% 0.07 268deg / 82%);
+    border-top: 1px solid oklch(100% 0 0deg / 8%);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .tab-item {
+    @apply flex flex-col font-medium gap-1 grow items-center pb-2 pt-3 text-white/45 text-xs;
+
+    transition: color 0.25s ease;
+  }
+
+  .tab-item svg {
+    transition:
+      scale 0.35s var(--ease-spring),
+      translate 0.35s var(--ease-spring);
+  }
+
+  .tab-item:hover {
+    @apply text-white/75;
+  }
+
+  .tab-item.active {
+    @apply text-btn-hover;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tab-item.active svg {
+      scale: 1.12;
+      translate: 0 -1px;
+    }
+
+    .tab-item:active svg {
+      scale: 0.9;
+    }
+  }
+
+  /* Panel framing the waveform canvas on app screens */
+  .wave-panel {
+    background: oklch(28% 0.08 266deg / 55%);
+    border: 1px solid oklch(100% 0 0deg / 10%);
+    border-radius: 1.25rem;
+  }
+
+  /* ---------- Result bottom sheet ---------- */
+
+  .sheet-backdrop {
+    @apply fixed inset-0 z-40;
+
+    backdrop-filter: blur(4px);
+    background: oklch(10% 0.04 268deg / 55%);
+  }
+
+  .sheet {
+    @apply bottom-0 fixed inset-x-0 mx-auto z-50;
+
+    background: linear-gradient(
+      to bottom,
+      oklch(34% 0.07 264deg),
+      var(--color-surface)
+    );
+    border: 1px solid oklch(100% 0 0deg / 12%);
+    border-bottom: none;
+    border-radius: 1.75rem 1.75rem 0 0;
+    box-shadow: 0 -24px 64px oklch(0% 0 0deg / 45%);
+    max-width: 30rem;
+    padding: 0.75rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
+  }
+
+  .sheet-handle {
+    @apply h-1.5 mb-4 mx-auto rounded-full w-12;
+
+    background: oklch(100% 0 0deg / 20%);
+  }
+
+  /* ---------- Record button ---------- */
+
+  /* Idle: inviting mint gradient. Recording: hot coral, with a glow scaled
+     by the live mic level via --level (set from JS). */
+  .record-btn {
+    @apply flex items-center justify-center relative rounded-full text-heading;
+
+    background: linear-gradient(
+      140deg,
+      var(--color-btn),
+      var(--color-btn-hover)
+    );
+    box-shadow: 0 10px 36px -10px oklch(75% 0.13 190deg / 80%);
+    height: 8rem;
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease,
+      color 0.3s ease,
+      scale 0.25s var(--ease-spring);
+    width: 8rem;
+  }
+
+  .record-btn:hover {
+    scale: 1.05;
+  }
+
+  .record-btn:active {
+    scale: 0.93;
+  }
+
+  .record-btn.is-recording {
+    @apply text-white;
+
+    background: linear-gradient(
+      140deg,
+      oklch(64% 0.24 27deg),
+      oklch(70% 0.19 45deg)
+    );
+    box-shadow: 0 10px 40px -8px oklch(64% 0.24 27deg / 65%);
+  }
+
+  .record-glow {
+    background: radial-gradient(
+      circle,
+      oklch(64% 0.24 27deg / 45%) 0%,
+      transparent 70%
+    );
+    border-radius: 9999px;
+    inset: -1.25rem;
+    opacity: calc(0.3 + var(--level, 0) * 0.7);
+    pointer-events: none;
+    position: absolute;
+    scale: calc(0.95 + var(--level, 0) * 0.6);
+  }
+
+  .record-ripple {
+    border: 2px solid oklch(64% 0.24 27deg / 55%);
+    border-radius: 9999px;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  /* Shimmer sweep over the results card while analysis runs. */
+  .shimmer-sweep {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .shimmer-sweep::after {
+    background: linear-gradient(
+      105deg,
+      transparent 25%,
+      oklch(91% 0.17 172deg / 25%) 50%,
+      transparent 75%
+    );
+    content: "";
+    inset: 0;
+    position: absolute;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .shimmer-sweep::after {
+      animation: shimmer 1.3s ease-in-out infinite;
+    }
   }
 }

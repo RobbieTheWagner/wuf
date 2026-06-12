@@ -7,7 +7,7 @@ const Footer: TOC<{ Element: HTMLDivElement }> = <template>
       <div class="flex flex-wrap items-center justify-between max-w-6xl w-full">
         <a href="/" class="inline-flex">
           <div class="inline-block">
-            <Wuf class="-mt-2 p-2" height="60" width="60" />
+            <Wuf class="-mt-2 logo-mark p-2" height="60" width="60" />
           </div>
           <div class="font-black text-3xl">
             Wüf
@@ -15,7 +15,7 @@ const Footer: TOC<{ Element: HTMLDivElement }> = <template>
         </a>
 
         <p class="text-sm">
-          Copyright © 2020
+          Copyright © 2026
           <a href="https://shipshape.io" class="underline hover:text-white">
             Ship Shape Consulting LLC.
           </a>

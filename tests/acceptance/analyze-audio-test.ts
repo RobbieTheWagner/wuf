@@ -42,21 +42,21 @@ module('Acceptance | analyze audio', function (hooks) {
 
     assert.strictEqual(currentURL(), '/microphone');
 
-    assert
-      .dom('[data-test-no-bark-type]')
-      .includesText('No data uploaded yet.');
+    assert.dom('[data-test-no-bark-type]').exists();
+    assert.dom('[data-test-bark-type]').doesNotExist();
 
-    await click('[data-test-start-recording-button]');
+    await click('[data-test-record-button]');
 
     // getUserMedia + MediaRecorder setup is async, so wait until recording
     // has actually started before stopping it
     await waitUntil(
       () =>
-        !find('[data-test-stop-recording-button]')?.hasAttribute('disabled'),
+        find('[data-test-record-button]')?.getAttribute('data-recording') ===
+        'true',
       { timeout: 10000 },
     );
 
-    await click('[data-test-stop-recording-button]');
+    await click('[data-test-record-button]');
 
     await waitFor('[data-test-bark-type]', { timeout: 10000 });
 
@@ -75,9 +75,8 @@ module('Acceptance | analyze audio', function (hooks) {
 
     assert.strictEqual(currentURL(), '/upload');
 
-    assert
-      .dom('[data-test-no-bark-type]')
-      .includesText('No data uploaded yet.');
+    assert.dom('[data-test-no-bark-type]').exists();
+    assert.dom('[data-test-bark-type]').doesNotExist();
 
     await selectFiles('#upload-audio', file);
 

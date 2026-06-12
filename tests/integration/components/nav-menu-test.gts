@@ -27,12 +27,12 @@ module('Integration | Component | nav-menu', function (hooks) {
   test('the mobile menu opens and closes', async function (assert) {
     await render(<template><NavMenu /></template>);
 
-    assert.dom('.nav-links').hasClass('hidden');
+    assert.dom('.nav-links').doesNotHaveClass('is-open');
 
     await click('[aria-label="Open navigation menu"]');
-    assert.dom('.nav-links').doesNotHaveClass('hidden');
+    assert.dom('.nav-links').hasClass('is-open');
 
     await click('[aria-label="Close navigation menu"]');
-    assert.dom('.nav-links').hasClass('hidden');
+    assert.dom('.nav-links').doesNotHaveClass('is-open');
   });
 });

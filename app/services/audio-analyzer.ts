@@ -1,5 +1,7 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { isTesting, macroCondition } from '@embroider/macros';
+import { animate } from 'motion';
 import {
   determineBarkOccurred,
   determineBarkPitch,
@@ -16,18 +18,90 @@ const barkDescriptions: Record<BarkType, string> = {
   playful: 'Your dog wants to play!',
 };
 
+export type AnalysisOutcome = 'success' | 'no-barks' | 'error';
+
+export interface WaveformChunk {
+  /** Amplitude deviation from silence, normalized 0 (flat) to 1 (max) */
+  extent: number;
+  /** Whether this chunk crossed the bark threshold */
+  bark: boolean;
+}
+
+const BAR_WIDTH = 3;
+const BAR_STEP = 5; // bar width + gap
+const MIN_BAR_HEIGHT = 2;
+const WAVE_TEAL = 'oklch(75% 0.13 190)';
+const WAVE_MINT = 'oklch(91% 0.17 172)';
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Down-samples chunks so they fit the canvas as one bar per BAR_STEP px,
+ * keeping the loudest extent (and any bark) from each group.
+ */
+function aggregateChunks(
+  chunks: WaveformChunk[],
+  maxBars: number,
+): WaveformChunk[] {
+  if (chunks.length <= maxBars) {
+    return chunks;
+  }
+
+  const groupSize = Math.ceil(chunks.length / maxBars);
+  const bars: WaveformChunk[] = [];
+
+  for (let i = 0; i < chunks.length; i += groupSize) {
+    const group = chunks.slice(i, i + groupSize);
+    bars.push({
+      extent: Math.max(...group.map((c) => c.extent)),
+      bark: group.some((c) => c.bark),
+    });
+  }
+
+  return bars;
+}
+
 export default class AudioAnalyzerService extends Service {
   @tracked barkType?: BarkType;
   @tracked barksOccurred: boolean[] = [];
   @tracked pitches: (Pitch | undefined)[] = [];
 
-  column = 0;
+  /** True from upload/record handoff until the reveal sweep finishes */
+  @tracked isAnalyzing = false;
+
+  /** Set when analysis ends: did we find barks, none, or fail to decode? */
+  @tracked outcome?: AnalysisOutcome;
+
+  /** Bark count revealed so far — ticks up in sync with the waveform sweep */
+  @tracked revealedBarkCount = 0;
+
+  chunks: WaveformChunk[] = [];
+  liveChunks: WaveformChunk[] = [];
+
   amplitudeArray?: Uint8Array<ArrayBuffer>;
   frequencyArray?: Uint8Array<ArrayBuffer>;
   audioContext?: AudioContext;
+  sweepControls?: { stop: () => void };
 
   get barkDescription(): string | undefined {
     return this.barkType ? barkDescriptions[this.barkType] : undefined;
+  }
+
+  /** Number of distinct bark events (rising edges in barksOccurred) */
+  get barkCount(): number {
+    let count = 0;
+    let previous = false;
+
+    for (const bark of this.barksOccurred) {
+      if (bark && !previous) {
+        count++;
+      }
+      previous = bark;
+    }
+
+    return count;
   }
 
   /**
@@ -39,7 +113,7 @@ export default class AudioAnalyzerService extends Service {
     const offline = new OfflineAudioContext(2, buffer.length, 44100);
     const bufferSource = offline.createBufferSource();
     bufferSource.onended = () => {
-      this.barkType = determineBarkType(this.barksOccurred, this.pitches);
+      this.revealAnalysis();
     };
     bufferSource.buffer = buffer;
 
@@ -67,8 +141,10 @@ export default class AudioAnalyzerService extends Service {
 
       this.barksOccurred.push(barkOccurred);
       this.pitches.push(pitch);
-
-      this.drawTimeDomain();
+      this.chunks.push({
+        extent: this.getChunkExtent(this.amplitudeArray!),
+        bark: barkOccurred,
+      });
     };
 
     bufferSource.start(0);
@@ -76,52 +152,81 @@ export default class AudioAnalyzerService extends Service {
   }
 
   /**
-   * Resets the barkType, barksOccurred, and pitches for a fresh run
+   * Sweeps the analyzed waveform across the canvas, ticking the bark counter
+   * as each bark scrolls past, then announces the verdict.
    */
-  clearBarkData(): void {
-    this.barkType = undefined;
-    this.barksOccurred = [];
-    this.column = 0;
-    this.pitches = [];
-  }
+  revealAnalysis(): void {
+    const barkType = determineBarkType(this.barksOccurred, this.pitches);
 
-  clearCanvas(): void {
-    const canvas = document.getElementById('canvas');
-    if (!(canvas instanceof HTMLCanvasElement)) {
+    const finish = () => {
+      this.revealedBarkCount = this.barkCount;
+      this.drawAnalyzedWaveform(1);
+      this.barkType = barkType;
+      this.outcome = barkType ? 'success' : 'no-barks';
+      this.isAnalyzing = false;
+    };
+
+    if (macroCondition(isTesting())) {
+      // Keep tests deterministic — skip the sweep
+      finish();
       return;
     }
 
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    if (prefersReducedMotion()) {
+      finish();
+      return;
+    }
+
+    this.sweepControls = animate(0, 1, {
+      duration: 1.4,
+      ease: [0.22, 0.61, 0.36, 1],
+      onUpdate: (progress) => {
+        this.drawAnalyzedWaveform(progress);
+        this.revealedBarkCount = this.countBarksRevealed(progress);
+      },
+      onComplete: finish,
+    });
   }
 
   /**
-   * Draws a visualization of the time domain data
+   * Resets the barkType, barksOccurred, and pitches for a fresh run
    */
-  drawTimeDomain(): void {
-    const canvas = document.getElementById('canvas');
-    if (!(canvas instanceof HTMLCanvasElement)) {
-      return;
-    }
+  clearBarkData(): void {
+    this.sweepControls?.stop();
+    this.sweepControls = undefined;
+    this.barkType = undefined;
+    this.barksOccurred = [];
+    this.pitches = [];
+    this.chunks = [];
+    this.liveChunks = [];
+    this.revealedBarkCount = 0;
+    this.isAnalyzing = false;
+    this.outcome = undefined;
+  }
 
-    const canvasHeight = canvas.clientHeight;
-    const canvasWidth = canvas.clientWidth;
-    const ctx = canvas.getContext('2d')!;
+  clearCanvas(): void {
+    const sized = this.getSizedCanvas();
+    sized?.ctx.clearRect(0, 0, sized.width, sized.height);
+  }
 
-    const { minValue, maxValue } = getTimeDomainMaxMin(this.amplitudeArray!);
+  /**
+   * Resets state ahead of live microphone visualization
+   */
+  beginLiveVisualization(): void {
+    this.clearBarkData();
+    this.clearCanvas();
+  }
 
-    const yLo = canvasHeight - canvasHeight * minValue - 1;
-    const yHi = canvasHeight - canvasHeight * maxValue - 1;
-
-    ctx.fillStyle = '#6FFFE9';
-    ctx.fillRect(this.column, yLo, 1, yHi - yLo);
-
-    // loop around the canvas when we reach the end
-    this.column += 1;
-    if (this.column >= canvasWidth) {
-      this.column = 0;
-      this.clearCanvas();
-    }
+  /**
+   * Appends a live microphone chunk and redraws the rolling waveform
+   * @param amplitudeArray Time domain data for the current animation frame
+   * @returns The chunk's amplitude extent (0..1), e.g. to drive a level meter
+   */
+  pushLiveChunk(amplitudeArray: ArrayLike<number>): number {
+    const extent = this.getChunkExtent(amplitudeArray);
+    this.liveChunks.push({ extent, bark: false });
+    this.drawLiveWaveform();
+    return extent;
   }
 
   /**
@@ -130,17 +235,163 @@ export default class AudioAnalyzerService extends Service {
   uploadAudioVideo(file: { blob: Blob }): void {
     this.clearBarkData();
     this.clearCanvas();
+    this.isAnalyzing = true;
     const fileReader = new FileReader();
     fileReader.onload = (ev) => {
       void (async () => {
-        this.audioContext = new AudioContext();
-        const buffer = await this.audioContext.decodeAudioData(
-          ev.target!.result as ArrayBuffer,
-        );
-        this.analyseAudio(buffer);
+        try {
+          this.audioContext = new AudioContext();
+          const buffer = await this.audioContext.decodeAudioData(
+            ev.target!.result as ArrayBuffer,
+          );
+          this.analyseAudio(buffer);
+        } catch {
+          // Undecodable/unsupported audio — tell the user instead of hanging
+          this.isAnalyzing = false;
+          this.outcome = 'error';
+        }
       })();
     };
     fileReader.readAsArrayBuffer(file.blob);
+  }
+
+  willDestroy(): void {
+    super.willDestroy();
+    this.sweepControls?.stop();
+  }
+
+  /** Bark events fully revealed at this point of the sweep */
+  private countBarksRevealed(progress: number): number {
+    const revealed = this.barksOccurred.slice(
+      0,
+      Math.floor(this.barksOccurred.length * progress),
+    );
+
+    let count = 0;
+    let previous = false;
+
+    for (const bark of revealed) {
+      if (bark && !previous) {
+        count++;
+      }
+      previous = bark;
+    }
+
+    return count;
+  }
+
+  /** Amplitude deviation from the 0.5 silence midline, scaled to 0..1 */
+  private getChunkExtent(amplitudeArray: ArrayLike<number>): number {
+    const { minValue, maxValue } = getTimeDomainMaxMin(amplitudeArray);
+    return Math.min(1, Math.max(0, maxValue - 0.5, 0.5 - minValue) * 2);
+  }
+
+  /**
+   * Sizes the canvas buffer to its CSS size * devicePixelRatio so bars render
+   * crisply, and returns a context scaled back to CSS pixel coordinates.
+   */
+  private getSizedCanvas():
+    | { ctx: CanvasRenderingContext2D; width: number; height: number }
+    | undefined {
+    const canvas = document.getElementById('canvas');
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      return undefined;
+    }
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+    }
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    return { ctx, width, height };
+  }
+
+  /** Draws the analyzed waveform up to `progress` (0..1) of its bars */
+  private drawAnalyzedWaveform(progress: number): void {
+    const sized = this.getSizedCanvas();
+    if (!sized) {
+      return;
+    }
+
+    const maxBars = Math.floor(sized.width / BAR_STEP);
+    const bars = aggregateChunks(this.chunks, maxBars);
+
+    // Stretch short clips across the canvas (chunkier bars, capped so a
+    // two-bark clip doesn't become comically wide), and center the strip
+    const step = Math.min(
+      12,
+      Math.max(BAR_STEP, Math.floor(sized.width / Math.max(bars.length, 1))),
+    );
+    const offsetX = Math.max(0, (sized.width - bars.length * step) / 2);
+
+    this.drawBars(sized, bars, Math.round(bars.length * progress), {
+      offsetX,
+      step,
+    });
+  }
+
+  /** Draws the live microphone waveform, newest chunk at the right edge */
+  private drawLiveWaveform(): void {
+    const sized = this.getSizedCanvas();
+    if (!sized) {
+      return;
+    }
+
+    const maxBars = Math.floor(sized.width / BAR_STEP);
+    const bars = this.liveChunks.slice(-maxBars);
+    this.drawBars(sized, bars, bars.length, {
+      offsetX: sized.width - bars.length * BAR_STEP,
+    });
+  }
+
+  /** Mirrored rounded bars around the vertical center, with a glow */
+  private drawBars(
+    sized: { ctx: CanvasRenderingContext2D; width: number; height: number },
+    bars: WaveformChunk[],
+    visibleCount: number,
+    { offsetX = 0, step = BAR_STEP }: { offsetX?: number; step?: number } = {},
+  ): void {
+    const { ctx, width, height } = sized;
+    const barWidth = Math.max(BAR_WIDTH, step - 2);
+
+    ctx.clearRect(0, 0, width, height);
+
+    const gradient = ctx.createLinearGradient(0, height, 0, 0);
+    gradient.addColorStop(0, WAVE_TEAL);
+    gradient.addColorStop(1, WAVE_MINT);
+
+    for (let i = 0; i < Math.min(visibleCount, bars.length); i++) {
+      const bar = bars[i]!;
+      const barHeight = Math.max(
+        MIN_BAR_HEIGHT,
+        bar.extent * (height - MIN_BAR_HEIGHT * 2),
+      );
+      const x = offsetX + i * step;
+      const y = (height - barHeight) / 2;
+
+      if (bar.bark) {
+        ctx.fillStyle = WAVE_MINT;
+        ctx.shadowColor = WAVE_MINT;
+        ctx.shadowBlur = 12;
+      } else {
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = WAVE_TEAL;
+        ctx.shadowBlur = 5;
+      }
+
+      ctx.beginPath();
+      ctx.roundRect(x, y, barWidth, barHeight, barWidth / 2);
+      ctx.fill();
+    }
+
+    ctx.shadowBlur = 0;
   }
 }
 

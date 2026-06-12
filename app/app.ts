@@ -1,3 +1,8 @@
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/500.css';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/700.css';
 import './styles/app.css';
 import Application from '@ember/application';
 import compatModules from '@embroider/virtual/compat-modules';

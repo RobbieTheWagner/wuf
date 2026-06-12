@@ -27,7 +27,7 @@ module('Integration | Component | audio-uploader', function (hooks) {
 
     await render(<template><AudioUploader /></template>);
 
-    assert.dom('[data-test-audio-upload-link]').hasText('Add audio/video.');
+    assert.dom('[data-test-audio-upload-link]').hasText('browse your files.');
 
     const file = new File(['fake audio'], 'bark.webm', {
       type: 'audio/webm',

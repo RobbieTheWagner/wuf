@@ -47,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Wüf listens to your dog's barks so it can tell you what they mean.</string>
 </dict>
 </plist>
