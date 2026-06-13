@@ -54,6 +54,7 @@ export default class UploadTemplate extends Component {
       @barkType={{this.audioAnalyzer.barkType}}
       @barkDescription={{this.audioAnalyzer.barkDescription}}
       @barkCount={{this.audioAnalyzer.revealedBarkCount}}
+      @translation={{this.audioAnalyzer.translation}}
       @onDismiss={{this.resetAnalysis}}
     />
   </template>

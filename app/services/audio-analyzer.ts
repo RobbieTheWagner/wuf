@@ -5,10 +5,17 @@ import { animate } from 'motion';
 import {
   determineBarkOccurred,
   determineBarkPitch,
-  determineBarkType,
+  determineBarkTonality,
+  translateBark,
   getTimeDomainMaxMin,
+  TONALITY_BINS,
 } from 'wuf/utils/barks';
-import type { BarkType, Pitch } from 'wuf/utils/barks';
+import type {
+  BarkType,
+  BarkTranslation,
+  Pitch,
+  Tonality,
+} from 'wuf/utils/barks';
 
 const barkDescriptions: Record<BarkType, string> = {
   alert:
@@ -67,6 +74,10 @@ export default class AudioAnalyzerService extends Service {
   @tracked barkType?: BarkType;
   @tracked barksOccurred: boolean[] = [];
   @tracked pitches: (Pitch | undefined)[] = [];
+  @tracked tonalities: (Tonality | undefined)[] = [];
+
+  /** Full acoustic read on the analyzed bout — set when analysis ends */
+  @tracked translation?: BarkTranslation;
 
   /** True from upload/record handoff until the reveal sweep finishes */
   @tracked isAnalyzing = false;
@@ -137,10 +148,16 @@ export default class AudioAnalyzerService extends Service {
       // This means we only need the first 12 buckets, which should cover ~0-4140 Hz
       const dogRangeFrequencyArray = this.frequencyArray!.slice(0, 12);
       const pitch = determineBarkPitch(dogRangeFrequencyArray);
+      // Tonality needs the noisy overtones above the fundamental, so it reads
+      // a wider band than pitch does (see TONALITY_BINS).
+      const tonality = determineBarkTonality(
+        this.frequencyArray!.slice(0, TONALITY_BINS),
+      );
       const barkOccurred = determineBarkOccurred(this.amplitudeArray!);
 
       this.barksOccurred.push(barkOccurred);
       this.pitches.push(pitch);
+      this.tonalities.push(tonality);
       this.chunks.push({
         extent: this.getChunkExtent(this.amplitudeArray!),
         bark: barkOccurred,
@@ -156,11 +173,17 @@ export default class AudioAnalyzerService extends Service {
    * as each bark scrolls past, then announces the verdict.
    */
   revealAnalysis(): void {
-    const barkType = determineBarkType(this.barksOccurred, this.pitches);
+    const translation = translateBark(
+      this.barksOccurred,
+      this.pitches,
+      this.tonalities,
+    );
+    const barkType = translation?.type;
 
     const finish = () => {
       this.revealedBarkCount = this.barkCount;
       this.drawAnalyzedWaveform(1);
+      this.translation = translation;
       this.barkType = barkType;
       this.outcome = barkType ? 'success' : 'no-barks';
       this.isAnalyzing = false;
@@ -195,8 +218,10 @@ export default class AudioAnalyzerService extends Service {
     this.sweepControls?.stop();
     this.sweepControls = undefined;
     this.barkType = undefined;
+    this.translation = undefined;
     this.barksOccurred = [];
     this.pitches = [];
+    this.tonalities = [];
     this.chunks = [];
     this.liveChunks = [];
     this.revealedBarkCount = 0;

@@ -16,3 +16,7 @@
 
 # broccoli-debug
 /DEBUG/
+
+# Scratch: raw bark clips/videos for manual labeling (committed fixtures live
+# in tests/fixtures/ as small base64 modules instead)
+bark-candidates/
