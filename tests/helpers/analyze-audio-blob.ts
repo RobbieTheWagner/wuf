@@ -61,12 +61,9 @@ export default function analyzeAudioBlob(
             );
           };
 
-          bufferSource.onended = () => {
-            resolve(translateBark(barksOccurred, pitches, tonalities));
-          };
-
           bufferSource.start(0);
-          void offline.startRendering();
+          await offline.startRendering();
+          resolve(translateBark(barksOccurred, pitches, tonalities));
         } catch (error) {
           reject(error instanceof Error ? error : new Error(String(error)));
         }
