@@ -43,7 +43,7 @@ export default function analyzeAudioBlob(
           bufferSource.connect(analyser);
           analyser.connect(scp);
           scp.connect(offline.destination);
-          const amplitudeArray = new Float32Array(analyser.fftSize);
+          const amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
           const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
 
           const barksOccurred: boolean[] = [];
@@ -51,7 +51,7 @@ export default function analyzeAudioBlob(
           const tonalities: (Tonality | undefined)[] = [];
 
           scp.onaudioprocess = () => {
-            analyser.getFloatTimeDomainData(amplitudeArray);
+            analyser.getByteTimeDomainData(amplitudeArray);
             analyser.getByteFrequencyData(frequencyArray);
 
             barksOccurred.push(determineBarkOccurred(amplitudeArray));
