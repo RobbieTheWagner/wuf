@@ -41,8 +41,8 @@ export default function analyzeAudioBlob(
           const scp = offline.createScriptProcessor(1024, 0, 1);
 
           bufferSource.connect(analyser);
+          analyser.connect(scp);
           scp.connect(offline.destination);
-
           const amplitudeArray = new Float32Array(analyser.fftSize);
           const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
 
