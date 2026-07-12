@@ -8,7 +8,10 @@ import type { AnimationSequence } from 'motion';
 import confetti from 'canvas-confetti';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import type { AnalysisOutcome } from 'wuf/services/audio-analyzer';
-import type { BarkType as BarkTypeName } from 'wuf/utils/barks';
+import type {
+  BarkType as BarkTypeName,
+  BarkTranslation,
+} from 'wuf/utils/barks';
 import Alert from 'wuf/svgs/alert.svg';
 import DigIn from 'wuf/svgs/dig-in.svg';
 import Distress from 'wuf/svgs/distress.svg';
@@ -34,6 +37,19 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+const pitchLabels: Record<NonNullable<BarkTranslation['pitch']>, string> = {
+  low: 'Low pitch',
+  mid: 'Mid pitch',
+  high: 'High pitch',
+};
+
+const rhythmLabels: Record<BarkTranslation['rhythm'], string> = {
+  single: 'Single bark',
+  rapid: 'Rapid',
+  measured: 'Steady',
+  spaced: 'Spaced out',
+};
+
 interface BarkResultSheetSignature {
   Args: {
     isAnalyzing?: boolean;
@@ -41,6 +57,7 @@ interface BarkResultSheetSignature {
     barkType?: BarkTypeName;
     barkDescription?: string;
     barkCount?: number;
+    translation?: BarkTranslation;
     onDismiss?: () => void;
   };
 }
@@ -72,6 +89,42 @@ export default class BarkResultSheet extends Component<BarkResultSheetSignature>
 
   get barkNoun() {
     return this.args.barkCount === 1 ? 'bark' : 'barks';
+  }
+
+  /**
+   * Acoustic traits behind the verdict, as short chip labels. Tonality is
+   * omitted from the summary: it is now measured on a finer pass (no longer
+   * saturated), but across our labelled clips real barks almost all read
+   * "tonal", so a chip would near-always show the same value. We surface it
+   * once we have clips that exercise the harsh end. It still feeds arousal.
+   */
+  get traits(): string[] {
+    const translation = this.args.translation;
+    if (!translation) {
+      return [];
+    }
+
+    const chips: string[] = [];
+    if (translation.pitch) {
+      chips.push(pitchLabels[translation.pitch]);
+    }
+    chips.push(rhythmLabels[translation.rhythm]);
+    return chips;
+  }
+
+  /** Plain-language confidence in the verdict, or undefined if unknown */
+  get confidenceLabel(): string | undefined {
+    const confidence = this.args.translation?.confidence;
+    if (confidence === undefined) {
+      return undefined;
+    }
+    if (confidence >= 0.45) {
+      return 'Strong read';
+    }
+    if (confidence >= 0.33) {
+      return 'Likely';
+    }
+    return 'Best guess';
   }
 
   /** Springs the sheet up from the bottom edge when it mounts */
@@ -200,7 +253,27 @@ export default class BarkResultSheet extends Component<BarkResultSheetSignature>
                       {{@barkCount}}
                       {{this.barkNoun}}
                       heard
+                      {{#if this.confidenceLabel}}
+                        ·
+                        {{this.confidenceLabel}}
+                      {{/if}}
                     </p>
+                  {{/if}}
+
+                  {{#if this.traits.length}}
+                    <ul
+                      class="flex flex-wrap gap-1.5 mt-2"
+                      data-reveal-line
+                      data-test-bark-traits
+                    >
+                      {{#each this.traits as |trait|}}
+                        <li
+                          class="bg-white/10 font-semibold px-2.5 py-1 rounded-full text-white/80 text-xs"
+                        >
+                          {{trait}}
+                        </li>
+                      {{/each}}
+                    </ul>
                   {{/if}}
 
                   <p class="mt-2 text-white/80" data-reveal-line>
