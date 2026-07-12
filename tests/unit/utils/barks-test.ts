@@ -5,7 +5,7 @@ import {
   determineBarkTonality,
   determineBarkType,
   segmentBarks,
-  spectralFlatness,
+  spectralFlatnessDb,
   summarizeRhythm,
   translateBark,
   getTimeDomainMaxMin,
@@ -97,26 +97,27 @@ module('Unit | Utility | barks', function () {
     );
   });
 
-  test('spectralFlatness is ~1 for a flat spectrum and near 0 for a pure tone', function (assert) {
+  test('spectralFlatnessDb is ~1 for a flat spectrum and near 0 for a pure tone', function (assert) {
     assert.true(
-      Math.abs(spectralFlatness([100, 100, 100, 100, 100, 100, 100, 100]) - 1) <
-        1e-6,
+      Math.abs(
+        spectralFlatnessDb([-50, -50, -50, -50, -50, -50, -50, -50]) - 1,
+      ) < 1e-6,
       'a perfectly flat spectrum has flatness 1',
     );
     assert.true(
-      spectralFlatness([255, 0, 0, 0, 0, 0, 0, 0]) < 0.2,
+      spectralFlatnessDb([0, -100, -100, -100, -100, -100, -100, -100]) < 0.2,
       'a single sharp peak has very low flatness',
     );
   });
 
   test('determineBarkTonality distinguishes harsh from tonal barks', function (assert) {
     assert.strictEqual(
-      determineBarkTonality([128, 128, 128, 128, 128, 128, 128, 128]),
+      determineBarkTonality([-50, -50, -50, -50, -50, -50, -50, -50]),
       'harsh',
       'broadband energy reads as harsh',
     );
     assert.strictEqual(
-      determineBarkTonality([255, 0, 0, 0, 0, 0, 0, 0]),
+      determineBarkTonality([0, -100, -100, -100, -100, -100, -100, -100]),
       'tonal',
       'a concentrated peak reads as tonal',
     );
@@ -234,6 +235,35 @@ module('Unit | Utility | barks', function () {
     assert.true(
       (translation?.confidence ?? 0) > 0,
       'confidence is a positive fraction',
+    );
+  });
+
+  test('a harsh bark raises arousal to moderate even when the pace is not rapid', function (assert) {
+    // A single bark → "single" rhythm (not rapid, not measured), so arousal
+    // here is driven purely by tonality — isolating the harsh → moderate branch
+    // of determineArousal, the one path the finer tonality pass actually feeds.
+    const harsh = translateBark(
+      [true, true, false],
+      ['low', 'low', undefined],
+      ['harsh', 'harsh', undefined],
+    );
+    assert.strictEqual(harsh?.rhythm, 'single', 'one bark is a single bark');
+    assert.strictEqual(harsh?.tonality, 'harsh');
+    assert.strictEqual(
+      harsh?.arousal,
+      'moderate',
+      'a harsh bark reads as moderate arousal',
+    );
+
+    const tonal = translateBark(
+      [true, true, false],
+      ['low', 'low', undefined],
+      ['tonal', 'tonal', undefined],
+    );
+    assert.strictEqual(
+      tonal?.arousal,
+      'calm',
+      'the same bark without harshness reads as calm',
     );
   });
 

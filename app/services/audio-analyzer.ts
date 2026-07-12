@@ -8,7 +8,9 @@ import {
   determineBarkTonality,
   translateBark,
   getTimeDomainMaxMin,
-  TONALITY_BINS,
+  TONALITY_FFT_SIZE,
+  TONALITY_MIN_BIN,
+  TONALITY_MAX_BIN,
 } from 'wuf/utils/barks';
 import type {
   BarkType,
@@ -93,6 +95,7 @@ export default class AudioAnalyzerService extends Service {
 
   amplitudeArray?: Uint8Array<ArrayBuffer>;
   frequencyArray?: Uint8Array<ArrayBuffer>;
+  tonalityArray?: Float32Array<ArrayBuffer>;
   audioContext?: AudioContext;
   sweepControls?: { stop: () => void };
 
@@ -131,27 +134,36 @@ export default class AudioAnalyzerService extends Service {
     const analyser = offline.createAnalyser();
     // fftSize of 128 means we will have 64 for frequencyBinCount
     analyser.fftSize = 128;
+    // A second, finer analyser dedicated to tonality (see TONALITY_FFT_SIZE):
+    // fftSize 128 is too coarse to resolve a bark's harmonics, so tonality is
+    // measured on its own ~21.5 Hz/bin pass.
+    const tonalityAnalyser = offline.createAnalyser();
+    tonalityAnalyser.fftSize = TONALITY_FFT_SIZE;
     const scp = offline.createScriptProcessor(1024, 0, 1);
 
     bufferSource.connect(analyser);
+    bufferSource.connect(tonalityAnalyser);
     scp.connect(offline.destination); // this is necessary for the script processor to start
 
     this.amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
     // The buckets of the array range from 0-22050 Hz, with each bucket representing ~345 Hz
     this.frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+    // dB-scaled magnitudes from the finer pass, for the tonality estimate
+    this.tonalityArray = new Float32Array(tonalityAnalyser.frequencyBinCount);
 
     scp.onaudioprocess = () => {
       analyser.getByteTimeDomainData(this.amplitudeArray!);
       analyser.getByteFrequencyData(this.frequencyArray!);
+      tonalityAnalyser.getFloatFrequencyData(this.tonalityArray!);
 
       // Since dog barks range from 250-4000 Hz, we should exclude any buckets above 4000 Hz
       // This means we only need the first 12 buckets, which should cover ~0-4140 Hz
       const dogRangeFrequencyArray = this.frequencyArray!.slice(0, 12);
       const pitch = determineBarkPitch(dogRangeFrequencyArray);
-      // Tonality needs the noisy overtones above the fundamental, so it reads
-      // a wider band than pitch does (see TONALITY_BINS).
+      // Tonality reads the dog band off the finer analyser, where the harmonics
+      // are actually resolved (see TONALITY_MIN_BIN/TONALITY_MAX_BIN).
       const tonality = determineBarkTonality(
-        this.frequencyArray!.slice(0, TONALITY_BINS),
+        this.tonalityArray!.slice(TONALITY_MIN_BIN, TONALITY_MAX_BIN),
       );
       const barkOccurred = determineBarkOccurred(this.amplitudeArray!);
 

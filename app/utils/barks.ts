@@ -18,13 +18,29 @@ export const BIN_WIDTH_HZ = 44100 / 128; // ≈ 344.5 Hz per frequency bin
 export const CHUNK_DURATION_MS = (1024 / 44100) * 1000; // ≈ 23.2 ms per chunk
 
 /**
- * Number of low frequency bins that carry a bark's energy. Dog barks live in
- * ~250–4000 Hz, plus a little harsh high-frequency spread, so the first 16
- * bins (~0–5.5 kHz) cover the fundamental and the noisy overtones that make a
- * bark sound harsh. Bins above this are mostly silence and would bias the
- * tonality estimate, so we exclude them.
+ * Tonality is measured on a dedicated, finer analysis pass. At fftSize 128
+ * (~345 Hz/bin) the spectrum is too coarse to resolve a bark's harmonics, so
+ * the spectral-flatness estimate saturates and can't tell harsh from clear
+ * barks. This second pass runs at fftSize 2048 (~21.5 Hz/bin), fine enough to
+ * see the harmonic structure that separates a clear/tonal bark from a noisy one.
  */
-export const TONALITY_BINS = 16;
+export const TONALITY_FFT_SIZE = 2048;
+const TONALITY_BIN_WIDTH_HZ = 44100 / TONALITY_FFT_SIZE; // ≈ 21.5 Hz per bin
+
+/**
+ * Dog-bark band for the tonality estimate, in Hz. Barks live in ~250–4000 Hz
+ * (fundamental plus the overtones that make a bark sound harsh); bins outside
+ * this are mostly silence and would bias the flatness toward "flat". These map
+ * to the slice of the fftSize-2048 spectrum we hand to {@link spectralFlatnessDb}.
+ */
+const TONALITY_MIN_HZ = 250;
+const TONALITY_MAX_HZ = 4000;
+export const TONALITY_MIN_BIN = Math.floor(
+  TONALITY_MIN_HZ / TONALITY_BIN_WIDTH_HZ,
+);
+export const TONALITY_MAX_BIN = Math.ceil(
+  TONALITY_MAX_HZ / TONALITY_BIN_WIDTH_HZ,
+);
 
 /** Spectral flatness at/above this is treated as a harsh (atonal) bark. */
 const HARSH_FLATNESS_THRESHOLD = 0.45;
@@ -96,25 +112,40 @@ export function determineBarkPitch(
 
 /**
  * Spectral flatness (a.k.a. Wiener entropy): the ratio of the geometric mean
- * to the arithmetic mean of the spectrum, in the range 0..1. A peaky, harmonic
- * spectrum (a clear, tonal bark) scores near 0; broadband noise (a harsh,
- * atonal bark) scores near 1. This is a cheap stand-in for the
+ * to the arithmetic mean of the power spectrum, in the range 0..1. A peaky,
+ * harmonic spectrum (a clear, tonal bark) scores near 0; broadband noise (a
+ * harsh, atonal bark) scores near 1. This is a cheap stand-in for the
  * harmonic-to-noise ratio that bioacoustics research uses to gauge tonality.
- * @param frequencyData Decibel-scaled magnitudes for each frequency bin
+ *
+ * Input is the AnalyserNode's `getFloatFrequencyData` output — per-bin
+ * magnitudes in decibels (≤ 0, with truly-silent bins at -Infinity). We convert
+ * each bin back to linear power before measuring, because flatness on the
+ * dB/byte scale compresses the dynamic range and saturates toward 1. Silent
+ * bins are clamped to `floorDb` so they contribute a finite, near-zero power.
+ * @param frequencyDataDb Per-bin magnitudes in decibels
+ * @param floorDb Decibel floor for silent/clamped bins
  */
-export function spectralFlatness(frequencyData: ArrayLike<number>): number {
-  let logSum = 0;
-  let sum = 0;
-  const n = frequencyData.length;
-
-  for (let i = 0; i < n; i++) {
-    // Shift by 1 so silent bins (0) don't send the geometric mean to zero
-    const value = frequencyData[i]! + 1;
-    logSum += Math.log(value);
-    sum += value;
+export function spectralFlatnessDb(
+  frequencyDataDb: ArrayLike<number>,
+  floorDb = -100,
+): number {
+  const n = frequencyDataDb.length;
+  if (n === 0) {
+    return 0;
   }
 
-  if (n === 0 || sum === 0) {
+  let logSum = 0;
+  let sum = 0;
+
+  for (let i = 0; i < n; i++) {
+    const db = Math.max(floorDb, frequencyDataDb[i]!);
+    // dB → linear power (10^(dB/10)); always > 0, so no log(0) guard needed
+    const power = Math.pow(10, db / 10);
+    logSum += Math.log(power);
+    sum += power;
+  }
+
+  if (sum === 0) {
     return 0;
   }
 
@@ -127,14 +158,14 @@ export function spectralFlatness(frequencyData: ArrayLike<number>): number {
 /**
  * Classifies a bark's tonality as harsh (noisy/atonal, e.g. aggression or
  * rough play) or tonal (clear/harmonic, e.g. fear, desperation, or greeting).
- * @param frequencyData Decibel-scaled magnitudes for the bark's frequency bins
+ * @param frequencyDataDb Decibel magnitudes for the bark's dog-band bins
  * @param threshold Flatness at/above which a bark counts as harsh
  */
 export function determineBarkTonality(
-  frequencyData: ArrayLike<number>,
+  frequencyDataDb: ArrayLike<number>,
   threshold = HARSH_FLATNESS_THRESHOLD,
 ): Tonality {
-  return spectralFlatness(frequencyData) >= threshold ? 'harsh' : 'tonal';
+  return spectralFlatnessDb(frequencyDataDb) >= threshold ? 'harsh' : 'tonal';
 }
 
 /**
@@ -255,11 +286,15 @@ interface BarkFeatures {
  * fast pulsing and long strings lean agitated/excited, deliberate gaps lean
  * lonely/greeting.
  *
- * Tonality is intentionally absent. At our fftSize of 128 the spectral-flatness
- * estimate saturates (~0.9–0.99 for every clip we measured), so it can't
- * separate harsh from clear barks and would only bias the result. That also
- * makes distress (which needs a clear/tonal cue to tell a fearful yelp from an
- * excited yip) the least reliable verdict until we analyse at finer resolution.
+ * Tonality is intentionally absent from *type* scoring. It is now measured on a
+ * finer pass (see {@link spectralFlatnessDb} / {@link TONALITY_FFT_SIZE}), which
+ * fixed the old saturation, so it is a real signal — but across our labelled
+ * clips it does not separate the emotional types: every bark reads fairly tonal
+ * (flatness ~0.02–0.18) and our one greeting clip lands right inside the alert
+ * cluster. Folding it into scoring would erode the alert/playful margins without
+ * fixing greeting, so it stays out until we have harsh/aggressive and distress
+ * clips that actually exercise the harsh end. Tonality still feeds
+ * {@link determineArousal} and is available for display.
  */
 function scoreBarkType(features: BarkFeatures): Record<BarkType, number> {
   const { pitch, rhythm, count } = features;

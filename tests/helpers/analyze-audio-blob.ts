@@ -3,7 +3,9 @@ import {
   determineBarkPitch,
   determineBarkTonality,
   translateBark,
-  TONALITY_BINS,
+  TONALITY_FFT_SIZE,
+  TONALITY_MIN_BIN,
+  TONALITY_MAX_BIN,
 } from 'wuf/utils/barks';
 import type { BarkTranslation, Pitch, Tonality } from 'wuf/utils/barks';
 
@@ -38,13 +40,21 @@ export default function analyzeAudioBlob(
           const analyser = offline.createAnalyser();
           // fftSize of 128 means we will have 64 for frequencyBinCount
           analyser.fftSize = 128;
+          // A second, finer analyser dedicated to tonality (see TONALITY_FFT_SIZE)
+          const tonalityAnalyser = offline.createAnalyser();
+          tonalityAnalyser.fftSize = TONALITY_FFT_SIZE;
           const scp = offline.createScriptProcessor(1024, 0, 1);
 
           bufferSource.connect(analyser);
+          bufferSource.connect(tonalityAnalyser);
           analyser.connect(scp);
+          tonalityAnalyser.connect(scp);
           scp.connect(offline.destination);
           const amplitudeArray = new Uint8Array(analyser.frequencyBinCount);
           const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+          const tonalityArray = new Float32Array(
+            tonalityAnalyser.frequencyBinCount,
+          );
 
           const barksOccurred: boolean[] = [];
           const pitches: (Pitch | undefined)[] = [];
@@ -53,11 +63,14 @@ export default function analyzeAudioBlob(
           scp.onaudioprocess = () => {
             analyser.getByteTimeDomainData(amplitudeArray);
             analyser.getByteFrequencyData(frequencyArray);
+            tonalityAnalyser.getFloatFrequencyData(tonalityArray);
 
             barksOccurred.push(determineBarkOccurred(amplitudeArray));
             pitches.push(determineBarkPitch(frequencyArray.slice(0, 12)));
             tonalities.push(
-              determineBarkTonality(frequencyArray.slice(0, TONALITY_BINS)),
+              determineBarkTonality(
+                tonalityArray.slice(TONALITY_MIN_BIN, TONALITY_MAX_BIN),
+              ),
             );
           };
 

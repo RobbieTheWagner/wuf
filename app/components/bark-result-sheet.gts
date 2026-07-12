@@ -93,8 +93,10 @@ export default class BarkResultSheet extends Component<BarkResultSheetSignature>
 
   /**
    * Acoustic traits behind the verdict, as short chip labels. Tonality is
-   * intentionally omitted — at our FFT resolution it can't reliably tell harsh
-   * from clear barks, so it isn't part of the classification or the summary.
+   * omitted from the summary: it is now measured on a finer pass (no longer
+   * saturated), but across our labelled clips real barks almost all read
+   * "tonal", so a chip would near-always show the same value. We surface it
+   * once we have clips that exercise the harsh end. It still feeds arousal.
    */
   get traits(): string[] {
     const translation = this.args.translation;
