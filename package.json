@@ -43,7 +43,7 @@
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
     "@capacitor/haptics": "^8.0.2",
-    "@capacitor/ios": "^8.4.0",
+    "@capacitor/ios": "^8.4.3",
     "@ember/app-tsconfig": "^1.0.3",
     "@ember/optional-features": "^3.0.0",
     "@ember/string": "^4.0.1",
